@@ -1,0 +1,10 @@
+ipch/
+*.sdf
+PhoneManager/PhoneManager.aps
+PhoneManager/Debug/
+PhoneManager/Release/
+PhoneManager.opensdf
+PhoneManager.v11.suo
+Debug/PhoneManager.exe
+Debug/PhoneManager.ilk
+Debug/PhoneManager.pdb
