@@ -80,7 +80,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            mD3DUtils->Render();  //‰÷»æÕº–Œ
+            //mD3DUtils->Render();  //‰÷»æÕº–Œ
         }
     }
 
@@ -135,7 +135,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		200, 100, 360, 640, NULL, NULL, hInstance, NULL);
+		0, 0, 1920, 1000, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
@@ -152,7 +152,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		MessageBox(NULL, "¥¥Ω®Œ∆¿Ì ß∞‹", "InitGriphics", MB_OK);
 	}
 
-	ShowWindow(hWnd, SW_NORMAL);
+	ShowWindow(hWnd, SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 
 	return TRUE;

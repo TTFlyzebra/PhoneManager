@@ -7,7 +7,7 @@ extern "C" {
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-#define PLAY_URL "rtmp://192.168.8.244/live/screen"
+#define PLAY_URL "rtmp://192.168.1.88/live/screen"
 //#define PLAY_URL "d:\\temp\\test.mp4"
 
 
@@ -185,12 +185,12 @@ DWORD VideoService::ffplay()
 	uint8_t *buffer;
 	static struct SwsContext *sws_ctx;
 	fly_frame = av_frame_alloc();
-	buf_size = av_image_get_buffer_size(AV_PIX_FMT_YUV420P,pCodecCtx_video->width,pCodecCtx_video->height,1);
+	buf_size = av_image_get_buffer_size(AV_PIX_FMT_RGB32,pCodecCtx_video->width,pCodecCtx_video->height,1);
 	buffer = (uint8_t *)av_malloc(buf_size);
 	av_image_fill_arrays(fly_frame->data,           // dst data[]
 		fly_frame->linesize,       // dst linesize[]
 		buffer,                    // src buffer
-		AV_PIX_FMT_YUV420P,        // pixel format
+		AV_PIX_FMT_RGB32,        // pixel format
 		pCodecCtx_video->width,        // width
 		pCodecCtx_video->height,       // height
 		1                          // align
@@ -200,7 +200,7 @@ DWORD VideoService::ffplay()
 		pCodecCtx_video->pix_fmt,  // src format
 		pCodecCtx_video->width,    // dst width
 		pCodecCtx_video->height,   // dst height
-		AV_PIX_FMT_YUV420P,    // dst format
+		AV_PIX_FMT_RGB32,    // dst format
 		SWS_BICUBIC,           // flags
 		NULL,                  // src filter
 		NULL,                  // dst filter
@@ -231,14 +231,17 @@ DWORD VideoService::ffplay()
 						);
 					fly_frame->width = frame->width;
 					fly_frame->height = frame->height;
-					uint8_t * video_buf = (uint8_t *) malloc((fly_frame->width*fly_frame->height* 3 / 2) * sizeof(uint8_t));
-					int start = 0;
-					memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height);
-					start=start+fly_frame->width*fly_frame->height;
-					memcpy(video_buf + start,fly_frame->data[1],fly_frame->width*fly_frame->height/4);
-					start=start+fly_frame->width*fly_frame->height/4;
-					memcpy(video_buf + start,fly_frame->data[2],fly_frame->width*fly_frame->height/4);
-					mD3DUtils->PushYUV(video_buf,frame->width,frame->height);					
+					uint8_t * video_buf = (uint8_t *) malloc((fly_frame->width*fly_frame->height* 4) * sizeof(uint8_t));
+					//int start = 0;
+					//memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height);
+					//start=start+fly_frame->width*fly_frame->height;
+					//memcpy(video_buf + start,fly_frame->data[1],fly_frame->width*fly_frame->height/4);
+					//start=start+fly_frame->width*fly_frame->height/4;
+					//memcpy(video_buf + start,fly_frame->data[2],fly_frame->width*fly_frame->height/4);
+					//mD3DUtils->PushYUV(video_buf,frame->width,frame->height);	
+					memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height*4);
+					mD3DUtils->PushYUV(video_buf,frame->width,frame->height);	
+					free(video_buf);
 				}
 			}
 		} else if (packet->stream_index == audioStream) {

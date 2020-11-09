@@ -6,6 +6,7 @@
 #pragma comment(lib,"winmm.lib") 
 #pragma comment(lib,"d3dx9.lib")
 
+#define MAX_NUM 14
 #define D3DFVF_CUSTOMVERTEX   (D3DFVF_XYZ|D3DFVF_TEX1)
 typedef unsigned __int8 uint8_t;  
 
@@ -32,7 +33,10 @@ private:
 	LPDIRECT3DDEVICE9       g_pd3dDevice;    //Direct3D设备对象
 	LPDIRECT3DVERTEXBUFFER9 g_pVB0;    //顶点缓冲区对象
 	LPDIRECT3DVERTEXBUFFER9 g_pVB1;    //顶点缓冲区对象
-	LPDIRECT3DTEXTURE9      g_pTexture;    //纹理对象
+	LPDIRECT3DTEXTURE9      g_pTexture;    //
+
+	LPDIRECT3DVERTEXBUFFER9 g_pVB[MAX_NUM];    //顶点缓冲区对象
+	LPDIRECT3DTEXTURE9      ppTexture[MAX_NUM];    //纹理对象
 
 	CRITICAL_SECTION Critical;
 };
