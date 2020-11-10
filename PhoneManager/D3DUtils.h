@@ -27,7 +27,7 @@ public:
 	HRESULT InitGriphics();
 	void Cleanup();
 	void Render();
-	void PushYUV(uint8_t *yuv,int widht, int height);
+	void PushYUV(uint8_t *yuv,int widht, int height, int size);
 private:
 	LPDIRECT3D9             g_pD3D;    //Direct3D对象
 	LPDIRECT3DDEVICE9       g_pd3dDevice;    //Direct3D设备对象

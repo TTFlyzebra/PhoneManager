@@ -3,15 +3,11 @@ extern "C" {
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
 #include <libswresample/swresample.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/hwcontext.h>
 };
 #include "D3DUtils.h"
 #pragma once
-
-struct videoBuffer
-{
-	char *yuvData[1280*720*3/2];
-	int size;
-};
 
 static bool isRunning;
 static bool isStop;
@@ -19,7 +15,7 @@ static bool isStop;
 class VideoService
 {
 public:
-	VideoService();
+	VideoService(HWND hwnd);
 	~VideoService(void);
 	static int VideoService::interrupt_cb(void *ctx);
 	void start(D3DUtils *mD3DUtils);
@@ -35,5 +31,6 @@ private:
 	DWORD ffplay();
 
 	D3DUtils *mD3DUtils;
+	HWND mHwnd;
 };
 

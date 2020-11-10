@@ -84,20 +84,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3DUtils.h" />
+    <ClInclude Include="dxva.h" />
     <ClInclude Include="PhoneManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="VideoService.h" />
+    <ClInclude Include="YUVTools.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3DUtils.cpp" />
+    <ClCompile Include="dxva.cpp" />
     <ClCompile Include="PhoneManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="VideoService.cpp" />
+    <ClCompile Include="YUVTools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PhoneManager.rc" />

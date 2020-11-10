@@ -28,7 +28,7 @@ void D3DUtils::SetupMatrices()
 	D3DXMatrixIdentity( &matWorld );
 	g_pd3dDevice->SetTransform( D3DTS_WORLD, &matWorld );
 	//创建并设置观察矩阵
-	D3DXVECTOR3 vEyePt( 0.0f, 0.0f, -10 );
+	D3DXVECTOR3 vEyePt( 0.0f, 0.0f, -4 );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vUpVec( 0.0f, 1.0f, 0.0f );
 	D3DXMATRIXA16 matView;
@@ -36,7 +36,7 @@ void D3DUtils::SetupMatrices()
 	g_pd3dDevice->SetTransform( D3DTS_VIEW, &matView );
 	//创建并设置投影矩阵
 	D3DXMATRIXA16 matProj;
-	D3DXMatrixPerspectiveFovLH( &matProj, D3DX_PI/4, 1.0f, 1.0f, 100.0f );
+	D3DXMatrixPerspectiveFovLH( &matProj, D3DX_PI/2, 1.0f, 1.0f, 1000.0f );
 	g_pd3dDevice->SetTransform( D3DTS_PROJECTION, &matProj );
 }
 //-----------------------------------------------------------------------------
@@ -82,20 +82,20 @@ HRESULT D3DUtils::InitGriphics()
 	}
 
 	//顶点数据
-	//CUSTOMVERTEX g_Vertices0[] =
-	//{
-	//	{ -4,   -4,  0.0f,  0.0f, 1.0f},   
-	//	{ -4,    4,  0.0f,  0.0f, 0.0f},    
-	//	{  4,   -4,  0.0f,  1.0f, 1.0f},    
-	//	{  4,    4,  0.0f,  1.0f, 0.0f}	
-	//};
 	CUSTOMVERTEX g_Vertices0[] =
 	{
-		{ -4,  0.1,  0.0f,  0.0f, 1.0f},   
+		{ -4,   -4,  0.0f,  0.0f, 1.0f},   
 		{ -4,    4,  0.0f,  0.0f, 0.0f},    
-		{ -3,  0.1,  0.0f,  1.0f, 1.0f},    
-		{ -3,    4,  0.0f,  1.0f, 0.0f}	
+		{  4,   -4,  0.0f,  1.0f, 1.0f},    
+		{  4,    4,  0.0f,  1.0f, 0.0f}	
 	};
+	//CUSTOMVERTEX g_Vertices0[] =
+	//{
+	//	{ -4,  0.1,  0.0f,  0.0f, 1.0f},   
+	//	{ -4,    4,  0.0f,  0.0f, 0.0f},    
+	//	{ -3,  0.1,  0.0f,  1.0f, 1.0f},    
+	//	{ -3,    4,  0.0f,  1.0f, 0.0f}	
+	//};
 
 	//创建顶点缓冲区
 	if( FAILED( g_pd3dDevice->CreateVertexBuffer(4*sizeof(CUSTOMVERTEX),0, D3DFVF_CUSTOMVERTEX,D3DPOOL_MANAGED, &g_pVB0,NULL)))
@@ -175,15 +175,16 @@ void D3DUtils::Render()
 	LeaveCriticalSection(&Critical);
 }
 
-void D3DUtils::PushYUV(uint8_t *yuv,int width, int height)
+void D3DUtils::PushYUV(uint8_t *yuv,int width, int height, int size)
 {
 	EnterCriticalSection(&Critical);
 	//新建一个纹理
-	
+	LPDIRECT3DTEXTURE9      ppTexture[1];
+	D3DXCreateTexture(g_pd3dDevice, width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_R8G8B8, D3DPOOL_DEFAULT, &ppTexture[0]);
 	D3DLOCKED_RECT LockedRect;
 	ppTexture[0]->LockRect(0, &LockedRect, NULL, 0);
 	//LockedRect.pBits = yuv;
-	memcpy(LockedRect.pBits,yuv,width*height*4);
+	memcpy(LockedRect.pBits,yuv,size);
 	ppTexture[0]->UnlockRect(0);
 	//清空后台缓冲区
 	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 123, 255), 1.0f, 0);
@@ -195,13 +196,6 @@ void D3DUtils::PushYUV(uint8_t *yuv,int width, int height)
 		g_pd3dDevice->SetStreamSource( 0, g_pVB0, 0, sizeof(CUSTOMVERTEX) );
 		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 		g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
-
-
-		g_pd3dDevice->SetTexture( 0, ppTexture[0] ); //设置纹理(重剑：在俩三角形上贴了张图)
-		g_pd3dDevice->SetStreamSource( 0, g_pVB1, 0, sizeof(CUSTOMVERTEX) );
-		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
-		g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
-
 		g_pd3dDevice->EndScene();
 	}
 	//将在后台缓冲区绘制的图形提交到前台缓冲区显示

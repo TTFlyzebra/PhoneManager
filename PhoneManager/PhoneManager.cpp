@@ -41,9 +41,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable;
 
 	// 初始化全局字符串
-	mD3DUtils = new D3DUtils();
-	mVideoService = new VideoService();
-
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_PHONEMANAGER, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
@@ -56,34 +53,15 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PHONEMANAGER));
 	//主消息循环:
-	//while (GetMessage(&msg, NULL, 0, 0))
-	//{
-	//	OutputDebugString("start render\n");
-	//	if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-	//	{
-	//		TranslateMessage(&msg);
-	//		DispatchMessage(&msg);
-	//	}		
-	//}
-
-
-	mVideoService->start(mD3DUtils);
-
-	int count = 0;
-    ZeroMemory( &msg, sizeof(msg) );
-    while( msg.message!=WM_QUIT )
-    {
-        if( PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE ) )
-        {
-            TranslateMessage( &msg );
-            DispatchMessage( &msg );
-        }
-        else
-        {
-            //mD3DUtils->Render();  //渲染图形
-        }
-    }
-
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}		
+	}
+	
 	delete mD3DUtils;
 	return (int) msg.wParam;
 }
@@ -135,12 +113,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		0, 0, 1920, 1000, NULL, NULL, hInstance, NULL);
+		200, 100, 380, 700, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
 		return FALSE;
 	}
+
+	mD3DUtils = new D3DUtils();
+	mVideoService = new VideoService(hWnd);
+
 	//初始化Direct3D
 	if(FAILED( mD3DUtils->InitD3D( hWnd ) ) )
 	{
@@ -151,10 +133,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	{
 		MessageBox(NULL, "创建纹理失败", "InitGriphics", MB_OK);
 	}
-
-	ShowWindow(hWnd, SW_MAXIMIZE);
+	
+	ShowWindow(hWnd, nCmdShow);
+	//ShowWindow(hWnd, SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 
+	mVideoService->start(mD3DUtils);
 	return TRUE;
 }
 

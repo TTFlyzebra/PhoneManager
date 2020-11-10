@@ -1,18 +1,69 @@
 #include "stdafx.h"
 #include "VideoService.h"
-extern "C" {
-#include "libavutil/imgutils.h"
-}
+#include "YUVTools.h"
+#include "dxva.h"
 
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-#define PLAY_URL "rtmp://192.168.1.88/live/screen"
-//#define PLAY_URL "d:\\temp\\test.mp4"
-
-
-VideoService::VideoService(void)
+//#define PLAY_URL "rtmp://192.168.8.244/live/webcam"
+#define PLAY_URL "d:\\temp\\test2.mp4"
+AVPixelFormat GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts)
 {
+	InputStream* ist = (InputStream*)s->opaque;
+	ist->active_hwaccel_id = HWACCEL_DXVA2;
+	ist->hwaccel_pix_fmt = AV_PIX_FMT_DXVA2_VLD;
+	return ist->hwaccel_pix_fmt;
+}
+
+BOOL HWAccelInit(AVCodec *codec, AVCodecContext *ctx, HWND hWnd)
+{
+	bool bRet = TRUE;
+	switch (codec->id)
+	{
+		case AV_CODEC_ID_MPEG2VIDEO:
+		case AV_CODEC_ID_H264:
+		case AV_CODEC_ID_VC1:
+		case AV_CODEC_ID_WMV3:
+		case AV_CODEC_ID_HEVC:
+		case AV_CODEC_ID_VP9:
+		{
+			// multi threading is apparently not compatible 
+			// with hardware decoding
+			ctx->thread_count = 1;  
+			InputStream *ist = new InputStream();
+			ist->hwaccel_id = HWACCEL_AUTO;
+			ist->active_hwaccel_id = HWACCEL_AUTO;
+			ist->hwaccel_device = "dxva2";
+			ist->dec = codec;
+			ist->dec_ctx = ctx;
+			ctx->opaque = ist;
+			if (dxva2_init(ctx, hWnd) == 0)
+			{
+				ctx->get_buffer2 = ist->hwaccel_get_buffer;
+				ctx->get_format = GetHwFormat;
+				ctx->thread_safe_callbacks = 1;
+				bRet = TRUE;
+			}
+			else
+			{
+				bRet = FALSE;
+			}
+
+			break;
+		}
+		default:
+		{
+			bRet = FALSE;
+			break;
+		}
+	}
+	return bRet;
+}
+
+VideoService::VideoService(HWND hwnd)
+{
+	mHwnd = hwnd;
 	isStop = true;
 	isRunning = false;
 	OutputDebugString("VideoService\n");	
@@ -30,7 +81,8 @@ void VideoService::start(D3DUtils *mD3DUtils)
 	this->mD3DUtils = mD3DUtils;
 	isStop = false;	
 	pid_ffplay = CreateThread(NULL, 0, &VideoService::ffplayThread, this, CREATE_SUSPENDED, NULL);
-	if (NULL!= pid_ffplay) {  
+	if (NULL!= pid_ffplay) 
+	{  
 		ResumeThread(pid_ffplay);  
 	}
 }
@@ -54,7 +106,8 @@ DWORD CALLBACK VideoService::ffplayThread(LPVOID lp)
 
 int VideoService:: interrupt_cb(void *ctx)
 {
-	if(isStop){
+	if(isStop)
+	{
 		OutputDebugString("VideoService interrupt_cb \n");	
 		return 1;
 	}
@@ -77,6 +130,7 @@ DWORD VideoService::ffplay()
 
 	av_register_all();
 	avformat_network_init();
+
 	pFormatCtx = avformat_alloc_context();	
 	pFormatCtx->interrupt_callback.callback = interrupt_cb;
 	pFormatCtx->interrupt_callback.opaque = pFormatCtx;
@@ -122,6 +176,7 @@ DWORD VideoService::ffplay()
 		OutputDebugString("VideoService not found decodec.\n");
 		return -1;
 	}
+
 	pCodecCtx_video = avcodec_alloc_context3(pCodec_video);
 	ret = avcodec_parameters_to_context(pCodecCtx_video, pCodecPar_video);
 	if (ret < 0) {
@@ -134,7 +189,7 @@ DWORD VideoService::ffplay()
 		return -1;
 	}
 
-	pCodecCtx_video->flags |=CODEC_FLAG_LOW_DELAY;
+	pCodecCtx_video->flags |=CODEC_FLAG_LOW_DELAY;	
 
 	//音频使用软解，初始化音频解码，音频不是必须存在
 	for (int i = 0; i < pFormatCtx->nb_streams; i++) {
@@ -181,31 +236,41 @@ DWORD VideoService::ffplay()
 	frame = av_frame_alloc();	
 	packet = (AVPacket *) av_malloc(sizeof(AVPacket)); //分配一个packet
 
-	int buf_size;
-	uint8_t *buffer;
-	static struct SwsContext *sws_ctx;
-	fly_frame = av_frame_alloc();
-	buf_size = av_image_get_buffer_size(AV_PIX_FMT_RGB32,pCodecCtx_video->width,pCodecCtx_video->height,1);
-	buffer = (uint8_t *)av_malloc(buf_size);
-	av_image_fill_arrays(fly_frame->data,           // dst data[]
-		fly_frame->linesize,       // dst linesize[]
-		buffer,                    // src buffer
-		AV_PIX_FMT_RGB32,        // pixel format
-		pCodecCtx_video->width,        // width
-		pCodecCtx_video->height,       // height
-		1                          // align
-		);
-	sws_ctx = sws_getContext(pCodecCtx_video->width,    // src width
-		pCodecCtx_video->height,   // src height
-		pCodecCtx_video->pix_fmt,  // src format
-		pCodecCtx_video->width,    // dst width
-		pCodecCtx_video->height,   // dst height
-		AV_PIX_FMT_RGB32,    // dst format
-		SWS_BICUBIC,           // flags
-		NULL,                  // src filter
-		NULL,                  // dst filter
-		NULL                   // param
-		);          
+	//int buf_size;
+	//uint8_t *buffer;
+	//static struct SwsContext *sws_ctx;
+	//fly_frame = av_frame_alloc();
+	//buf_size = av_image_get_buffer_size(
+	//	AV_PIX_FMT_YUV420P,
+	//	pCodecCtx_video->width,
+	//	pCodecCtx_video->height,
+	//	1
+	//	);
+	//buffer = (uint8_t *)av_malloc(buf_size);
+	//av_image_fill_arrays(fly_frame->data,           // dst data[]
+	//	fly_frame->linesize,       // dst linesize[]
+	//	buffer,                    // src buffer
+	//	AV_PIX_FMT_YUV420P,        // pixel format
+	//	pCodecCtx_video->width,        // width
+	//	pCodecCtx_video->height,       // height
+	//	1                          // align
+	//	);
+	//sws_ctx = sws_getContext(pCodecCtx_video->width,    // src width
+	//	pCodecCtx_video->height,   // src height
+	//	pCodecCtx_video->pix_fmt,  // src format
+	//	pCodecCtx_video->width,    // dst width
+	//	pCodecCtx_video->height,   // dst height
+	//	AV_PIX_FMT_YUV420P,    // dst format
+	//	SWS_BICUBIC,           // flags
+	//	NULL,                  // src filter
+	//	NULL,                  // dst filter
+	//	NULL                   // param
+	//	);  
+
+	BOOL bRet = HWAccelInit(pCodec_video, pCodecCtx_video, mHwnd);
+	if (!bRet){
+		OutputDebugString("VideoService HWAccelInit error.\n");
+	}
 
 	while (!isStop ) {	
 		ret = av_read_frame(pFormatCtx, packet);
@@ -221,27 +286,31 @@ DWORD VideoService::ffplay()
 			while (ret >= 0) {
 				ret = avcodec_receive_frame(pCodecCtx_video, frame);
 				if (ret >= 0) {
-					sws_scale(sws_ctx,                                  // sws context
-						(const uint8_t *const *)frame->data,  // src slice
-						frame->linesize,                      // src stride
-						0,                                        // src slice y
-						pCodecCtx_video->height,                      // src slice height
-						fly_frame->data,                          // dst planes
-						fly_frame->linesize                       // dst strides
-						);
-					fly_frame->width = frame->width;
-					fly_frame->height = frame->height;
-					uint8_t * video_buf = (uint8_t *) malloc((fly_frame->width*fly_frame->height* 4) * sizeof(uint8_t));
-					//int start = 0;
-					//memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height);
-					//start=start+fly_frame->width*fly_frame->height;
-					//memcpy(video_buf + start,fly_frame->data[1],fly_frame->width*fly_frame->height/4);
-					//start=start+fly_frame->width*fly_frame->height/4;
-					//memcpy(video_buf + start,fly_frame->data[2],fly_frame->width*fly_frame->height/4);
-					//mD3DUtils->PushYUV(video_buf,frame->width,frame->height);	
-					memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height*4);
-					mD3DUtils->PushYUV(video_buf,frame->width,frame->height);	
-					free(video_buf);
+					//硬解
+					dxva2_retrieve_data_call(pCodecCtx_video, frame);
+
+					//sws_scale(sws_ctx,                                  // sws context
+					//	(const uint8_t *const *)frame->data,  // src slice
+					//	frame->linesize,                      // src stride
+					//	0,                                        // src slice y
+					//	pCodecCtx_video->height,                      // src slice height
+					//	fly_frame->data,                          // dst planes
+					//	fly_frame->linesize                       // dst strides
+					//	);
+					//fly_frame->width = frame->width;
+					//fly_frame->height = frame->height;
+					//uint8_t * video_buf = (uint8_t *) malloc((frame->linesize[0]*frame->height* 4) * sizeof(uint8_t));
+					////int start = 0;
+					////memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height);
+					////start=start+fly_frame->width*fly_frame->height;
+					////memcpy(video_buf + start,fly_frame->data[1],fly_frame->width*fly_frame->height/4);
+					////start=start+fly_frame->width*fly_frame->height/4;
+					////memcpy(video_buf + start,fly_frame->data[2],fly_frame->width*fly_frame->height/4);
+					////mD3DUtils->PushYUV(video_buf,frame->width,frame->height);	
+					//yuv420pToRGB32(frame->data[0],frame->data[1],frame->data[2],frame->linesize[0],frame->height,*(frame->linesize),video_buf);
+					////memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height*4);
+					//mD3DUtils->PushYUV(video_buf,frame->linesize[0],frame->height,frame->linesize[0]*frame->height*4);	
+					//free(video_buf);
 				}
 			}
 		} else if (packet->stream_index == audioStream) {
