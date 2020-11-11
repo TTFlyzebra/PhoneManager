@@ -84,7 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3DUtils.h" />
-    <ClInclude Include="dxva.h" />
     <ClInclude Include="PhoneManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -94,7 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3DUtils.cpp" />
-    <ClCompile Include="dxva.cpp" />
     <ClCompile Include="PhoneManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
