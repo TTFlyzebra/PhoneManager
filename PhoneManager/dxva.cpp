@@ -12,7 +12,7 @@
 * Lesser General Public License for more details.
 *
 * You should have received a copy of the GNU Lesser General Public
-* License along with FFmpeg; if not, write to the Free Software
+* License along with FFmpeg; if not, write to the Free Software 
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
@@ -308,18 +308,18 @@ static int dxva2_retrieve_data(AVCodecContext *s, AVFrame *frame)
 	HRESULT            hr;
 	int                ret;
 
-	IDirect3DSurface9_GetDesc(surface, &surfaceDesc);
-	hr = IDirect3DSurface9_LockRect(surface, &LockedRect, NULL, D3DLOCK_READONLY);
-	if (FAILED(hr)) {
-		av_log(NULL, AV_LOG_ERROR, "Unable to lock DXVA2 surface\n");
-			return AVERROR_UNKNOWN;
-	}
-	//picture->data[0] = (uint8_t*)LockedRect.pBits;
-	//picture->data[1] = (uint8_t*)LockedRect.pBits + LockedRect.Pitch * surfaceDesc.Height;
-	//frameWidth = frame->width;
-	//frameHeight = frame->height;
-	//
-   IDirect3DSurface9_UnlockRect(surface);
+   //IDirect3DSurface9_GetDesc(surface, &surfaceDesc);
+   //hr = IDirect3DSurface9_LockRect(surface, &LockedRect, NULL, D3DLOCK_READONLY);
+   //if (FAILED(hr)) {
+   //  av_log(NULL, AV_LOG_ERROR, "Unable to lock DXVA2 surface\n");
+   //  return AVERROR_UNKNOWN;
+   //}
+   //picture->data[0] = (uint8_t*)LockedRect.pBits;
+   //picture->data[1] = (uint8_t*)LockedRect.pBits + LockedRect.Pitch * surfaceDesc.Height;
+   //frameWidth = frame->width;
+   //frameHeight = frame->height;
+   //
+   //IDirect3DSurface9_UnlockRect(surface);
 
     return 0;
 }

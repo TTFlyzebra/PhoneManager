@@ -6,8 +6,8 @@
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-//#define PLAY_URL "rtmp://192.168.8.244/live/webcam"
-#define PLAY_URL "d:\\temp\\test2.mp4"
+#define PLAY_URL "rtmp://192.168.8.244/live/screen"
+//#define PLAY_URL "d:\\temp\\test2.mp4"
 AVPixelFormat GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts)
 {
 	InputStream* ist = (InputStream*)s->opaque;
@@ -61,9 +61,9 @@ BOOL HWAccelInit(AVCodec *codec, AVCodecContext *ctx, HWND hWnd)
 	return bRet;
 }
 
-VideoService::VideoService(HWND hwnd)
+VideoService::VideoService()
 {
-	mHwnd = hwnd;
+	
 	isStop = true;
 	isRunning = false;
 	OutputDebugString("VideoService\n");	
@@ -76,9 +76,11 @@ VideoService::~VideoService(void)
 }
 
 
-void VideoService::start(D3DUtils *mD3DUtils)
+void VideoService::start(HWND hwnd, D3DUtils *mD3DUtils,int my_num)
 {
+	this->mHwnd = hwnd;
 	this->mD3DUtils = mD3DUtils;
+	this->myNUM = my_num;
 	isStop = false;	
 	pid_ffplay = CreateThread(NULL, 0, &VideoService::ffplayThread, this, CREATE_SUSPENDED, NULL);
 	if (NULL!= pid_ffplay) 
@@ -236,41 +238,45 @@ DWORD VideoService::ffplay()
 	frame = av_frame_alloc();	
 	packet = (AVPacket *) av_malloc(sizeof(AVPacket)); //分配一个packet
 
-	//int buf_size;
-	//uint8_t *buffer;
-	//static struct SwsContext *sws_ctx;
-	//fly_frame = av_frame_alloc();
-	//buf_size = av_image_get_buffer_size(
-	//	AV_PIX_FMT_YUV420P,
-	//	pCodecCtx_video->width,
-	//	pCodecCtx_video->height,
-	//	1
-	//	);
-	//buffer = (uint8_t *)av_malloc(buf_size);
-	//av_image_fill_arrays(fly_frame->data,           // dst data[]
-	//	fly_frame->linesize,       // dst linesize[]
-	//	buffer,                    // src buffer
-	//	AV_PIX_FMT_YUV420P,        // pixel format
-	//	pCodecCtx_video->width,        // width
-	//	pCodecCtx_video->height,       // height
-	//	1                          // align
-	//	);
-	//sws_ctx = sws_getContext(pCodecCtx_video->width,    // src width
-	//	pCodecCtx_video->height,   // src height
-	//	pCodecCtx_video->pix_fmt,  // src format
-	//	pCodecCtx_video->width,    // dst width
-	//	pCodecCtx_video->height,   // dst height
-	//	AV_PIX_FMT_YUV420P,    // dst format
-	//	SWS_BICUBIC,           // flags
-	//	NULL,                  // src filter
-	//	NULL,                  // dst filter
-	//	NULL                   // param
-	//	);  
+	int buf_size;
+	uint8_t *buffer;
+	static struct SwsContext *sws_ctx;
+	fly_frame = av_frame_alloc();
+	int width = pCodecCtx_video->width;
+	int height = pCodecCtx_video->height;
+	width = width+(32-width%32);
+	buf_size = av_image_get_buffer_size(
+		AV_PIX_FMT_YUV420P,
+		width,
+		height,
+		1
+		);
+	buffer = (uint8_t *)av_malloc(buf_size);
+	av_image_fill_arrays(
+		fly_frame->data,           // dst data[]
+		fly_frame->linesize,       // dst linesize[]
+		buffer,                    // src buffer
+		AV_PIX_FMT_YUV420P,        // pixel format
+		width,    // width
+		height,   // height
+		1                          // align
+		);
+	sws_ctx = sws_getContext(pCodecCtx_video->width,    // src width
+		pCodecCtx_video->height,   // src height
+		pCodecCtx_video->pix_fmt,  // src format
+		width,    // dst width
+		height,   // dst height
+		AV_PIX_FMT_YUV420P,    // dst format
+		SWS_BICUBIC,           // flags
+		NULL,                  // src filter
+		NULL,                  // dst filter
+		NULL                   // param
+		);  
 
-	BOOL bRet = HWAccelInit(pCodec_video, pCodecCtx_video, mHwnd);
-	if (!bRet){
-		OutputDebugString("VideoService HWAccelInit error.\n");
-	}
+	//BOOL bRet = HWAccelInit(pCodec_video, pCodecCtx_video, mHwnd);
+	//if (!bRet){
+	//	OutputDebugString("VideoService HWAccelInit error.\n");
+	//}
 
 	while (!isStop ) {	
 		ret = av_read_frame(pFormatCtx, packet);
@@ -287,7 +293,7 @@ DWORD VideoService::ffplay()
 				ret = avcodec_receive_frame(pCodecCtx_video, frame);
 				if (ret >= 0) {
 					//硬解
-					dxva2_retrieve_data_call(pCodecCtx_video, frame);
+					//dxva2_retrieve_data_call(pCodecCtx_video, frame);
 
 					//sws_scale(sws_ctx,                                  // sws context
 					//	(const uint8_t *const *)frame->data,  // src slice
@@ -297,20 +303,11 @@ DWORD VideoService::ffplay()
 					//	fly_frame->data,                          // dst planes
 					//	fly_frame->linesize                       // dst strides
 					//	);
-					//fly_frame->width = frame->width;
-					//fly_frame->height = frame->height;
-					//uint8_t * video_buf = (uint8_t *) malloc((frame->linesize[0]*frame->height* 4) * sizeof(uint8_t));
-					////int start = 0;
-					////memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height);
-					////start=start+fly_frame->width*fly_frame->height;
-					////memcpy(video_buf + start,fly_frame->data[1],fly_frame->width*fly_frame->height/4);
-					////start=start+fly_frame->width*fly_frame->height/4;
-					////memcpy(video_buf + start,fly_frame->data[2],fly_frame->width*fly_frame->height/4);
-					////mD3DUtils->PushYUV(video_buf,frame->width,frame->height);	
-					//yuv420pToRGB32(frame->data[0],frame->data[1],frame->data[2],frame->linesize[0],frame->height,*(frame->linesize),video_buf);
-					////memcpy(video_buf,fly_frame->data[0],fly_frame->width*fly_frame->height*4);
-					//mD3DUtils->PushYUV(video_buf,frame->linesize[0],frame->height,frame->linesize[0]*frame->height*4);	
-					//free(video_buf);
+			
+					uint8_t * video_buf = (uint8_t *) malloc((width*height* 4) * sizeof(uint8_t));				
+					yuv420pToRGB32(frame->data[0],frame->data[1],frame->data[2],width,height,width,video_buf);
+					mD3DUtils->RenderRGB32(video_buf,width,height,width*height*4, myNUM);	
+					free(video_buf);
 				}
 			}
 		} else if (packet->stream_index == audioStream) {
@@ -350,7 +347,6 @@ DWORD VideoService::ffplay()
 void VideoService::stop()
 {
 	isStop = true;
-	Sleep(1);
 	while (isRunning){
 		OutputDebugString("Can't stop VideoService, because is Running...\n");
 		Sleep(1000);

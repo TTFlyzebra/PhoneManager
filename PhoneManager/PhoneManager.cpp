@@ -3,9 +3,9 @@
 
 #include "stdafx.h"
 #include <Windows.h>
-#include "PhoneManager.h"
 #include <d3dx9.h>
 
+#include "PhoneManager.h"
 #include "D3DUtils.h"
 #include "VideoService.h"
 
@@ -16,8 +16,8 @@ HINSTANCE hInst;								// 当前实例
 TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
 TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
-D3DUtils *mD3DUtils;
-VideoService *mVideoService;
+D3DUtils mD3DUtils;
+VideoService mVideoService[MAX_NUM];
 
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -62,7 +62,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		}		
 	}
 	
-	delete mD3DUtils;
 	return (int) msg.wParam;
 }
 
@@ -113,32 +112,27 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		200, 100, 380, 700, NULL, NULL, hInstance, NULL);
+		0, 0, 640, 384, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
 		return FALSE;
 	}
-
-	mD3DUtils = new D3DUtils();
-	mVideoService = new VideoService(hWnd);
-
-	//初始化Direct3D
-	if(FAILED( mD3DUtils->InitD3D( hWnd ) ) )
-	{
-		MessageBox(NULL, "创建纹理失败", "InitD3D", MB_OK);
-	}
-	//创建场景图形
-	if( FAILED( mD3DUtils->InitGriphics() ) )
-	{
-		MessageBox(NULL, "创建纹理失败", "InitGriphics", MB_OK);
-	}
-	
 	ShowWindow(hWnd, nCmdShow);
 	//ShowWindow(hWnd, SW_MAXIMIZE);
 	UpdateWindow(hWnd);
+	//初始化Direct3D 
 
-	mVideoService->start(mD3DUtils);
+	RECT rect;
+	GetClientRect (hWnd, &rect) ;
+
+	if(FAILED( mD3DUtils.InitD3D( hWnd, rect.right,rect.bottom ) ) )
+	{
+		MessageBox(NULL, "创建纹理失败", "InitD3D", MB_OK);
+	}
+	for(int i=0;i<MAX_NUM;i++){
+		mVideoService[i].start(hWnd, &mD3DUtils, i);
+	}
 	return TRUE;
 }
 
@@ -157,6 +151,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
+	TEXTMETRIC tm;
+	int width;
+	int height;
 
 	switch (message)
 	{
@@ -176,13 +173,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
 		break;
+	case WM_CREATE:		
+		RECT rect;
+		GetClientRect (hWnd, &rect) ;
+		OutputDebugString("WM_CREATE\n");
+		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		// TODO: 在此添加任意绘图代码...
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
-		PostQuitMessage(0);
+		for(int i=0;i<MAX_NUM;i++){
+			mVideoService[i].stop();
+		}
+		mD3DUtils.Cleanup();
+		PostQuitMessage(0);		
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
