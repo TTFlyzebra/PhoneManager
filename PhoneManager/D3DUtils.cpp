@@ -63,7 +63,7 @@ HRESULT D3DUtils::InitD3D( HWND hWnd, int width, int height )
 		return E_FAIL;
 	}
 	//
-	
+
 	for(int i=0;i<MAX_NUM;i++){		
 		//顶点数据
 		float left = 1.0f+(i%7)*99.0f/(14/2.0f) - 50.0f;
@@ -141,23 +141,22 @@ void D3DUtils::RenderRGB32(uint8_t *rgb32,int width, int height, int size, int n
 	memcpy(LockedRect.pBits,rgb32,size);
 	g_pTexture[num]->UnlockRect(0);
 
-	//开始在后台缓冲区绘制图形
-	DWORD currentTime = GetTickCount(); 
-	if((currentTime-lastPlayTime)>=40){
-		g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 123, 255), 1.0f, 0);
-		if(SUCCEEDED( g_pd3dDevice->BeginScene()))
-		{
-			for(int i=0;i<MAX_NUM;i++){
-				g_pd3dDevice->SetTexture(0, g_pTexture[0]); //设置纹理(重剑：在俩三角形上贴了张图)
-				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
-				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
-				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
-			}
-			g_pd3dDevice->EndScene();
-
-		}
-		lastPlayTime = currentTime;
-	}	
+	////开始在后台缓冲区绘制图形
+	//DWORD currentTime = GetTickCount(); 
+	//if((currentTime-lastPlayTime)>=40){
+	//	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 123, 255), 1.0f, 0);
+	if(SUCCEEDED( g_pd3dDevice->BeginScene()))
+	{
+		//for(int i=0;i<MAX_NUM;i++){
+		g_pd3dDevice->SetTexture(0, g_pTexture[num]); //设置纹理(重剑：在俩三角形上贴了张图)
+		g_pd3dDevice->SetStreamSource( 0, g_pVB[num], 0, sizeof(CUSTOMVERTEX) );
+		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
+		g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
+		//}
+		g_pd3dDevice->EndScene();
+	}
+	//lastPlayTime = currentTime;
+	//}	
 	//将在后台缓冲区绘制的图形提交到前台缓冲区显示
 	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	LeaveCriticalSection(&cs);
