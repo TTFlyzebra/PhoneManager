@@ -259,35 +259,7 @@ D3DPRESENT_PARAMETERS d3dpp = { 0 };
 RECT m_rtViewport;
 IDirect3DSurface9 * m_pDirect3DSurfaceRender = NULL;
 IDirect3DSurface9 * m_pBackBuffer = NULL;
-static int dxva2_retrieve_data(AVCodecContext *s, AVFrame *frame)
-{
-	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
-	InputStream        *ist = (InputStream *)s->opaque;
-	DXVA2Context       *ctx = (DXVA2Context *)ist->hwaccel_ctx;
 
-	EnterCriticalSection(&cs);
-
-	ctx->d3d9device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-	ctx->d3d9device->BeginScene();
-	if (m_pBackBuffer)
-	{
-		m_pBackBuffer->Release();
-		m_pBackBuffer = NULL;
-	}
-	ctx->d3d9device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_pBackBuffer);
-	ctx->d3d9device->StretchRect(surface, NULL, m_pBackBuffer, NULL, D3DTEXF_LINEAR);
-	ctx->d3d9device->EndScene();
-	ctx->d3d9device->Present(NULL, NULL, NULL, NULL);
-
-	LeaveCriticalSection(&cs);
-
-
-	D3DSURFACE_DESC    surfaceDesc;
-	D3DLOCKED_RECT     LockedRect;
-	HRESULT            hr;
-	int                ret;
-	return 0;
-}
 
 static int dxva2_alloc(AVCodecContext *s, HWND hwnd)
 {
@@ -310,7 +282,6 @@ static int dxva2_alloc(AVCodecContext *s, HWND hwnd)
 	ist->hwaccel_ctx = ctx;
 	ist->hwaccel_uninit = dxva2_uninit;
 	ist->hwaccel_get_buffer = dxva2_get_buffer;
-	ist->hwaccel_retrieve_data = dxva2_retrieve_data;
 
 	ctx->d3dlib = LoadLibrary("d3d9.dll");
 	if (!ctx->d3dlib) {
@@ -389,21 +360,18 @@ static int dxva2_alloc(AVCodecContext *s, HWND hwnd)
 		goto fail;
 	}
 
-	//hr = IDirect3DDeviceManager9_ResetDevice(ctx->d3d9devmgr, ctx->d3d9device, resetToken);
 	hr = ctx->d3d9devmgr->ResetDevice(ctx->d3d9device, resetToken);
 	if (FAILED(hr)) {
 		av_log(NULL, loglevel, "Failed to bind Direct3D device to device manager\n");
 		goto fail;
 	}
 
-	//hr = IDirect3DDeviceManager9_OpenDeviceHandle(ctx->d3d9devmgr, &ctx->deviceHandle);
 	hr = ctx->d3d9devmgr->OpenDeviceHandle(&ctx->deviceHandle);
 	if (FAILED(hr)) {
 		av_log(NULL, loglevel, "Failed to open device handle\n");
 		goto fail;
 	}
 
-	//hr = IDirect3DDeviceManager9_GetVideoService(ctx->d3d9devmgr, ctx->deviceHandle, &IID_IDirectXVideoDecoderService, (void **)&ctx->decoder_service);
 	hr = ctx->d3d9devmgr->GetVideoService(ctx->deviceHandle, IID_IDirectXVideoDecoderService, (void **)&ctx->decoder_service);
 	if (FAILED(hr)) {
 		av_log(NULL, loglevel, "Failed to create IDirectXVideoDecoderService\n");
@@ -438,7 +406,6 @@ static int dxva2_get_decoder_configuration(AVCodecContext *s, const GUID *device
 	HRESULT hr;
 	int i;
 
-	//hr = IDirectXVideoDecoderService_GetDecoderConfigurations(ctx->decoder_service, device_guid, desc, NULL, &cfg_count, &cfg_list);
 	hr = ctx->decoder_service->GetDecoderConfigurations(*device_guid, desc, NULL, &cfg_count, &cfg_list);
 	if (FAILED(hr)) {
 		av_log(NULL, loglevel, "Unable to retrieve decoder configurations\n");
@@ -498,7 +465,6 @@ static int dxva2_create_decoder(AVCodecContext *s)
 	int surface_alignment;
 	int ret;
 
-	//hr = IDirectXVideoDecoderService_GetDecoderDeviceGuids(ctx->decoder_service, &guid_count, &guid_list);
 	hr = ctx->decoder_service->GetDecoderDeviceGuids(&guid_count, &guid_list);
 	if (FAILED(hr)) {
 		av_log(NULL, loglevel, "Failed to retrieve decoder device GUIDs\n");
@@ -600,13 +566,6 @@ static int dxva2_create_decoder(AVCodecContext *s)
 		goto fail;
 	}
 
-	/*hr = IDirectXVideoDecoderService_CreateSurface(ctx->decoder_service,
-	FFALIGN(s->coded_width, surface_alignment),
-	FFALIGN(s->coded_height, surface_alignment),
-	ctx->num_surfaces - 1,
-	target_format, D3DPOOL_DEFAULT, 0,
-	DXVA2_VideoDecoderRenderTarget,
-	ctx->surfaces, NULL);*/
 	hr = ctx->decoder_service->CreateSurface(FFALIGN(s->coded_width, surface_alignment),
 		FFALIGN(s->coded_height, surface_alignment),
 		ctx->num_surfaces - 1,
@@ -678,49 +637,6 @@ int dxva2_init(AVCodecContext *s, HWND hwnd)
 		return ret;
 	}
 
-	return 0;
-}
-
-int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num)
-{
-	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
-	InputStream  *ist = (InputStream  *)s->opaque;
-	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
-	D3DSURFACE_DESC    surfaceDesc;
-	D3DLOCKED_RECT     srcLockedRect;
-	D3DLOCKED_RECT     objLockedRect;
-	HRESULT            hr;
-	int                ret;
-
-	EnterCriticalSection(&cs);
-	//surface->GetDesc(&surfaceDesc);
-    surface->LockRect(&srcLockedRect, NULL, D3DLOCK_READONLY);
-	if(g_pTexture[num]==NULL){
-		D3DXCreateTexture(g_pd3dDevice, 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num]);
-	    //hr = g_pd3dDevice->CreateTexture ( 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num], NULL ) ;
-		//if (FAILED(hr)) {
-		//	OutputDebugString("CreateTexture FAILED");
-		//}
-	}
-	g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);
-	memcpy(objLockedRect.pBits,srcLockedRect.pBits,392*640*1.5);
-	g_pTexture[num]->UnlockRect(0);
-	surface->UnlockRect();
-
-	if(num==0){
-		for(int i=0;i<MAX_NUM;i++) {
-			if(g_pTexture[i]!=NULL){
-				g_pd3dDevice->BeginScene();
-				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
-				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
-				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
-				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
-				g_pd3dDevice->EndScene();				
-			}
-		}
-		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-	}
-	LeaveCriticalSection(&cs);
 	return 0;
 }
 
@@ -936,4 +852,62 @@ void D3DUtils::RenderRGB32(uint8_t *rgb32,int width, int height, int size, int n
 	//将在后台缓冲区绘制的图形提交到前台缓冲区显示
 	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	LeaveCriticalSection(&cs);
+}
+
+int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num)
+{
+	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
+	InputStream  *ist = (InputStream  *)s->opaque;
+	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
+	D3DSURFACE_DESC    surfaceDesc;
+	D3DLOCKED_RECT     srcLockedRect;
+	D3DLOCKED_RECT     objLockedRect;
+	HRESULT            hr;
+	int                ret;
+
+	//EnterCriticalSection(&cs);
+	//ctx->d3d9device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+	//ctx->d3d9device->BeginScene();
+	//if (m_pBackBuffer)
+	//{
+	//	m_pBackBuffer->Release();
+	//	m_pBackBuffer = NULL;
+	//}
+	//ctx->d3d9device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_pBackBuffer);
+	//ctx->d3d9device->StretchRect(surface, NULL, m_pBackBuffer, NULL, D3DTEXF_LINEAR);
+	//ctx->d3d9device->EndScene();
+	//ctx->d3d9device->Present(NULL, NULL, NULL, NULL);
+	//LeaveCriticalSection(&cs);
+	//return 0;
+
+	EnterCriticalSection(&cs);
+	//surface->GetDesc(&surfaceDesc);
+    surface->LockRect(&srcLockedRect, NULL, D3DLOCK_READONLY);
+	if(g_pTexture[num]==NULL){
+		D3DXCreateTexture(g_pd3dDevice, 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num]);
+	    //hr = g_pd3dDevice->CreateTexture ( 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num], NULL ) ;
+		//if (FAILED(hr)) {
+		//	OutputDebugString("CreateTexture FAILED");
+		//}
+	}
+	g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);
+	memcpy(objLockedRect.pBits,srcLockedRect.pBits,392*640*1.5);
+	g_pTexture[num]->UnlockRect(0);
+	surface->UnlockRect();
+
+	if(num==0){
+		g_pd3dDevice->BeginScene();
+		for(int i=0;i<MAX_NUM;i++) {			
+			if(g_pTexture[i]!=NULL){				
+				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
+				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
+				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
+				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);								
+			}			
+		}
+		g_pd3dDevice->EndScene();
+		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	}
+	LeaveCriticalSection(&cs);
+	return 0;
 }
