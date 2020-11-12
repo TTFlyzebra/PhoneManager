@@ -3,6 +3,7 @@
 
 #include <d3d9.h>
 #include <dxva2api.h>
+#include "YUVTools.h"
 
 extern "C"
 {
@@ -881,25 +882,35 @@ int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int nu
 	//return 0;
 
 	EnterCriticalSection(&cs);
-	//surface->GetDesc(&surfaceDesc);
+	surface->GetDesc(&surfaceDesc);
     surface->LockRect(&srcLockedRect, NULL, D3DLOCK_READONLY);
 	if(g_pTexture[num]==NULL){
-		D3DXCreateTexture(g_pd3dDevice, 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num]);
-	    //hr = g_pd3dDevice->CreateTexture ( 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num], NULL ) ;
-		//if (FAILED(hr)) {
-		//	OutputDebugString("CreateTexture FAILED");
-		//}
+		D3DXCreateTexture(g_pd3dDevice, surfaceDesc.Width, surfaceDesc.Height, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num]);
 	}
-	g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);
-	memcpy(objLockedRect.pBits,srcLockedRect.pBits,392*640*1.5);
-	g_pTexture[num]->UnlockRect(0);
+	if(num==0){
+		g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);	
+		NV12ToRGB32(
+			(const BYTE *)srcLockedRect.pBits,
+			(const BYTE *)srcLockedRect.pBits+srcLockedRect.Pitch*surfaceDesc.Height,
+			srcLockedRect.Pitch, 
+			surfaceDesc.Height, 
+			srcLockedRect.Pitch,
+			(BYTE *)objLockedRect.pBits);
+		//yuv_nv21_to_rgb((BYTE *)objLockedRect.pBits,(BYTE *)srcLockedRect.pBits,srcLockedRect.Pitch,surfaceDesc.Height);
+		//memcpy(objLockedRect.pBits,srcLockedRect.pBits,srcLockedRect.Pitch*surfaceDesc.Height*1.5);
+		g_pTexture[num]->UnlockRect(0);
+	}else{
+		g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);	
+		memcpy(objLockedRect.pBits,srcLockedRect.pBits,srcLockedRect.Pitch*surfaceDesc.Height*1.5);
+		g_pTexture[num]->UnlockRect(0);
+	}
 	surface->UnlockRect();
 
 	if(num==0){
 		g_pd3dDevice->BeginScene();
 		for(int i=0;i<MAX_NUM;i++) {			
-			if(g_pTexture[i]!=NULL){				
-				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
+			if(g_pTexture[0]!=NULL){				
+				g_pd3dDevice->SetTexture(0, g_pTexture[0]); //设置纹理(重剑：在俩三角形上贴了张图)
 				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
 				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);								

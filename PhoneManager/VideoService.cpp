@@ -14,8 +14,8 @@ extern "C" {
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-#define PLAY_URL "rtmp://192.168.8.244/live/screen"
-//#define PLAY_URL "d:\\temp\\test2.mp4"
+#define PLAY_URL "rtmp://192.168.1.88/live/screen"
+//#define PLAY_URL "d:\\temp\\test_720_1280.mp4"
 
 
 VideoService::VideoService()
