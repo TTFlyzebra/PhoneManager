@@ -350,7 +350,7 @@ static int dxva2_alloc(AVCodecContext *s, HWND hwnd)
 	d3dpp.BackBufferCount = 0;
 	d3dpp.hDeviceWindow = hwnd;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
+	d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
 	d3dpp.EnableAutoDepthStencil = FALSE;
 	d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 	d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
@@ -482,6 +482,7 @@ static const d3d_format_t *D3dFindFormat(D3DFORMAT format)
 	return NULL;
 }
 
+D3DFORMAT target_format = D3DFMT_X8R8G8B8;
 static int dxva2_create_decoder(AVCodecContext *s)
 {
 	InputStream  *ist = (InputStream *)s->opaque;
@@ -491,7 +492,6 @@ static int dxva2_create_decoder(AVCodecContext *s)
 	GUID *guid_list = NULL;
 	unsigned guid_count = 0, i, j;
 	GUID device_guid = GUID_NULL;
-	D3DFORMAT target_format = D3DFMT_X8R8G8B8;
 	DXVA2_VideoDesc desc = { 0 };
 	DXVA2_ConfigPictureDecode config;
 	HRESULT hr;
@@ -683,108 +683,44 @@ int dxva2_init(AVCodecContext *s, HWND hwnd)
 
 int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num)
 {
-	//LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
-	//InputStream        *ist = (InputStream *)s->opaque;
-	//DXVA2Context       *ctx = (DXVA2Context *)ist->hwaccel_ctx;
-	//
-	////EnterCriticalSection(&cs);
-	////ctx->d3d9device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-	////ctx->d3d9device->BeginScene();
-	////if (m_pBackBuffer)
-	////{
-	////	m_pBackBuffer->Release();
-	////	m_pBackBuffer = NULL;
-	////}
-	////ctx->d3d9device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_pBackBuffer);
-	////ctx->d3d9device->StretchRect(surface, NULL, m_pBackBuffer, NULL, D3DTEXF_LINEAR);
-	////ctx->d3d9device->EndScene();
-	////ctx->d3d9device->Present(NULL, NULL, NULL, NULL);
-	////LeaveCriticalSection(&cs);
 	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
+	InputStream  *ist = (InputStream  *)s->opaque;
+	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
 	D3DSURFACE_DESC    surfaceDesc;
-	D3DLOCKED_RECT     LockedRect;
+	D3DLOCKED_RECT     srcLockedRect;
+	D3DLOCKED_RECT     objLockedRect;
 	HRESULT            hr;
 	int                ret;
 
 	EnterCriticalSection(&cs);
-    IDirect3DSurface9_GetDesc(surface, &surfaceDesc);
-    hr = IDirect3DSurface9_LockRect(surface, &LockedRect, NULL, D3DLOCK_READONLY);
-    if (FAILED(hr)) {
-      av_log(NULL, AV_LOG_ERROR, "Unable to lock DXVA2 surface\n");
-      return AVERROR_UNKNOWN;
-    }
-	//新建一个纹理
+	//surface->GetDesc(&surfaceDesc);
+    surface->LockRect(&srcLockedRect, NULL, D3DLOCK_READONLY);
 	if(g_pTexture[num]==NULL){
-		D3DXCreateTexture(g_pd3dDevice, surfaceDesc.Width, surfaceDesc.Height, 1, D3DUSAGE_DYNAMIC, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &g_pTexture[num]);
-	}
-	D3DLOCKED_RECT lll;
-	g_pTexture[num]->LockRect(0, &lll, NULL, 0);
-	//LockedRect.pBits = yuv;
-	memcpy(lll.pBits,LockedRect.pBits,surfaceDesc.Width * surfaceDesc.Height);
-	g_pTexture[num]->UnlockRect(0);
-	IDirect3DSurface9_UnlockRect(surface);
-	if(SUCCEEDED( g_pd3dDevice->BeginScene()))
-	{
-		//for(int i=0;i<MAX_NUM;i++){
-		g_pd3dDevice->SetTexture(0, g_pTexture[num]); //设置纹理(重剑：在俩三角形上贴了张图)
-		g_pd3dDevice->SetStreamSource( 0, g_pVB[num], 0, sizeof(CUSTOMVERTEX) );
-		g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
-		g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
+		D3DXCreateTexture(g_pd3dDevice, 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num]);
+	    //hr = g_pd3dDevice->CreateTexture ( 392/4, 640, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num], NULL ) ;
+		//if (FAILED(hr)) {
+		//	OutputDebugString("CreateTexture FAILED");
 		//}
-		g_pd3dDevice->EndScene();
 	}
-	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-	LeaveCriticalSection(&cs);
-	/*
-	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
-	InputStream        *ist = (InputStream *)s->opaque;
-	DXVA2Context       *ctx = (DXVA2Context *)ist->hwaccel_ctx;
+	g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);
+	memcpy(objLockedRect.pBits,srcLockedRect.pBits,392*640*1.5);
+	g_pTexture[num]->UnlockRect(0);
+	surface->UnlockRect();
 
-	HRESULT hr ;
-	int ret = 0 ;
-
-	EnterCriticalSection(&cs);
-
-	IDirect3DSurface9 *g_OffScreenSurface = NULL;
-	ctx->d3d9device->SetRenderTarget(0, g_OffScreenSurface);
-	ctx->d3d9device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(200, 200, 200), 1.0f, 0);
-	ctx->d3d9device->BeginScene();
-	ctx->d3d9device->SetTexture(0, NULL);
-	GetClientRect(d3dpp.hDeviceWindow, &m_rtViewport);
-	ctx->d3d9device->StretchRect(surface, NULL, g_OffScreenSurface, NULL, D3DTEXF_LINEAR);
-	ctx->d3d9device->EndScene();
-
-
-	ctx->d3d9device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_pBackBuffer);
-	ctx->d3d9device->SetRenderTarget(0, m_pBackBuffer);
-
-	ctx->d3d9device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
-		D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-
-	ctx->d3d9device->BeginScene();
-	IDirect3DTexture9* g_SurfaceTexture;
-	g_pd3dDevice->CreateTexture ( 360, 640, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &g_SurfaceTexture, NULL ) ;
-	g_SurfaceTexture->GetSurfaceLevel(0, &g_OffScreenSurface);
-	g_pd3dDevice->SetTexture(0, g_SurfaceTexture); //设置纹理(重剑：在俩三角形上贴了张图)
-	g_pd3dDevice->SetStreamSource( 0, g_pVB[0], 0, sizeof(CUSTOMVERTEX) );
-	g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
-	g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
-
-	ctx->d3d9device->EndScene();
-	hr = ctx->d3d9device->Present(NULL, NULL, NULL, NULL);
-	if (FAILED(hr)) {
-		if (ctx->d3d9device->TestCooperativeLevel() == D3DERR_DEVICENOTRESET)
-		{
-			printf("Failed to Present !") ;
-			ret = -1 ;
+	if(num==0){
+		for(int i=0;i<MAX_NUM;i++) {
+			if(g_pTexture[i]!=NULL){
+				g_pd3dDevice->BeginScene();
+				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
+				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
+				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
+				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);
+				g_pd3dDevice->EndScene();				
+			}
 		}
-	}
-	else
-	{
-		ret = 0 ;
+		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 	LeaveCriticalSection(&cs);
-	*/
 	return 0;
 }
 
