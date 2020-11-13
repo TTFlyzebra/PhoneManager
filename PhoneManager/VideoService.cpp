@@ -14,8 +14,8 @@ extern "C" {
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-#define PLAY_URL "rtmp://192.168.1.88/live/screen"
-//#define PLAY_URL "d:\\temp\\test_720_1280.mp4"
+#define PLAY_URL "rtmp://192.168.8.244/live/screen"
+#define PLAY_URL2 "d:\\temp\\test.mp4"
 
 
 VideoService::VideoService()
@@ -93,11 +93,11 @@ DWORD VideoService::ffplay()
 	pFormatCtx->interrupt_callback.callback = interrupt_cb;
 	pFormatCtx->interrupt_callback.opaque = pFormatCtx;
 	AVDictionary* avdic = NULL;
-	av_dict_set(&avdic, "probesize", "32", 0);
-	av_dict_set(&avdic, "max_analyze_duration", "100000", 0);
-	int ret =  avformat_open_input(&pFormatCtx, PLAY_URL, nullptr, &avdic);	
+	//av_dict_set(&avdic, "probesize", "32", 0);
+	//av_dict_set(&avdic, "max_analyze_duration", "100000", 0);
+	int ret =  avformat_open_input(&pFormatCtx, myNUM%2==0?PLAY_URL:PLAY_URL2, nullptr, &avdic);	
 	
-	av_dict_free(&avdic);
+	//av_dict_free(&avdic);
 	if (ret != 0) {
 		wsprintf(pformat,"VideoService Couldn't open url=%s, (ret:%d)\n", PLAY_URL, ret);
 		OutputDebugString(pformat);

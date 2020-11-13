@@ -3,13 +3,12 @@
 
 #include <d3d9.h>
 #include <dxva2api.h>
-#include "YUVTools.h"
+
 
 extern "C"
 {
-
+#include "libyuv.h"
 #include "libavcodec/dxva2.h"
-
 #include "libavutil/avassert.h"
 #include "libavutil/buffer.h"
 #include "libavutil/frame.h"
@@ -772,6 +771,12 @@ HRESULT D3DUtils::InitD3D( HWND hWnd, int width, int height )
 			top = start - t_height - 1.0f*width/height;
 			bottom = start - 2.0f *t_height - 1.0f*width/height;
 		}
+		//CUSTOMVERTEX g_Vertices[] =	{
+		//	{ -50, -50,  0.0f,  0.0f, 1.0f},   
+		//	{ -50,  50,  0.0f,  0.0f, 0.0f},    
+		//	{  50, -50,  0.0f,  1.0f, 1.0f},    
+		//	{  50,  50,  0.0f,  1.0f, 0.0f}	
+		//};
 		CUSTOMVERTEX g_Vertices[] =
 		{
 			{left,   bottom, 0.0f,  0.0f, 1.0f},   
@@ -855,6 +860,34 @@ void D3DUtils::RenderRGB32(uint8_t *rgb32,int width, int height, int size, int n
 	LeaveCriticalSection(&cs);
 }
 
+void NV12_RGB32_SSE(const BYTE *yBuf, const BYTE *uvBuf, const int width, const int height, int lineSize, BYTE *rgbBuf) { 	
+	int dstIndex = 0;
+	int uvIndex = 0;
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			BYTE y = yBuf[i * lineSize + j];
+			uvIndex = i/2*lineSize+j-j%2;
+			BYTE u = uvBuf[uvIndex];
+			BYTE v = uvBuf[uvIndex+1];
+
+			dstIndex = (width*i+j) * 4;
+			int data = (int)(y + 1.772 * (u - 128));
+			rgbBuf[dstIndex] = ((data < 0) ? 0 : (data > 255 ? 255 : data));
+
+			data = (int)(y - 0.34414 * (u - 128) - 0.71414 * (v - 128));
+			rgbBuf[dstIndex + 1] = ((data < 0) ? 0 : (data > 255 ? 255 : data));
+
+			data = (int)(y + 1.402 * (v - 128));
+			rgbBuf[dstIndex + 2] = ((data < 0) ? 0 : (data > 255 ? 255 : data));
+		}
+	}
+	//__asm{
+	//	mov eax,lineSize;     
+	//	add eax,0;  
+	//	mov lineSize,eax; 
+	//}
+}
+
 int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num)
 {
 	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
@@ -880,37 +913,44 @@ int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int nu
 	//ctx->d3d9device->Present(NULL, NULL, NULL, NULL);
 	//LeaveCriticalSection(&cs);
 	//return 0;
-
+	if(g_pTexture[num]==NULL){
+		D3DXCreateTexture(g_pd3dDevice, frame->width, frame->height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &g_pTexture[num]);
+	}
 	EnterCriticalSection(&cs);
 	surface->GetDesc(&surfaceDesc);
-    surface->LockRect(&srcLockedRect, NULL, D3DLOCK_READONLY);
-	if(g_pTexture[num]==NULL){
-		D3DXCreateTexture(g_pd3dDevice, surfaceDesc.Width, surfaceDesc.Height, 1, D3DUSAGE_DYNAMIC, target_format, D3DPOOL_DEFAULT, &g_pTexture[num]);
-	}
-	if(num==0){
-		g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);	
-		NV12ToRGB32(
-			(const BYTE *)srcLockedRect.pBits,
-			(const BYTE *)srcLockedRect.pBits+srcLockedRect.Pitch*surfaceDesc.Height,
-			srcLockedRect.Pitch, 
-			surfaceDesc.Height, 
-			srcLockedRect.Pitch,
-			(BYTE *)objLockedRect.pBits);
-		//yuv_nv21_to_rgb((BYTE *)objLockedRect.pBits,(BYTE *)srcLockedRect.pBits,srcLockedRect.Pitch,surfaceDesc.Height);
-		//memcpy(objLockedRect.pBits,srcLockedRect.pBits,srcLockedRect.Pitch*surfaceDesc.Height*1.5);
-		g_pTexture[num]->UnlockRect(0);
-	}else{
-		g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);	
-		memcpy(objLockedRect.pBits,srcLockedRect.pBits,srcLockedRect.Pitch*surfaceDesc.Height*1.5);
-		g_pTexture[num]->UnlockRect(0);
-	}
-	surface->UnlockRect();
+    surface->LockRect(&srcLockedRect, NULL, D3DLOCK_READONLY);	
 
+	g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);
+	//libyuv::NV12ToARGB(
+	//	  (const uint8_t*)srcLockedRect.pBits,
+    //       srcLockedRect.Pitch,
+    //       (const uint8_t*)srcLockedRect.pBits+srcLockedRect.Pitch*surfaceDesc.Height,
+    //       srcLockedRect.Pitch/2,
+    //       (uint8_t*) objLockedRect.pBits,
+    //       objLockedRect.Pitch,
+    //       objLockedRect.Pitch/4,
+    //       surfaceDesc.Height);
+	//
+	libyuv::ConvertToARGB(
+		(const uint8_t*)srcLockedRect.pBits,
+		srcLockedRect.Pitch*surfaceDesc.Height * 3 /2,
+		(uint8_t*) objLockedRect.pBits, 
+		objLockedRect.Pitch,
+		0, 
+		0,
+		srcLockedRect.Pitch, 
+		surfaceDesc.Height,
+		objLockedRect.Pitch/4, 
+		surfaceDesc.Height,
+		libyuv::kRotate0,
+		libyuv::FOURCC_NV12);
+	g_pTexture[num]->UnlockRect(0);
+	surface->UnlockRect();
 	if(num==0){
 		g_pd3dDevice->BeginScene();
 		for(int i=0;i<MAX_NUM;i++) {			
 			if(g_pTexture[0]!=NULL){				
-				g_pd3dDevice->SetTexture(0, g_pTexture[0]); //设置纹理(重剑：在俩三角形上贴了张图)
+				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
 				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
 				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);								

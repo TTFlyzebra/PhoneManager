@@ -14,6 +14,7 @@ extern "C" {
 #pragma comment(lib,"d3d9.lib") 
 #pragma comment(lib,"winmm.lib") 
 #pragma comment(lib,"d3dx9.lib")
+#pragma comment(lib,"yuv.lib") 
 
 #define MAX_NUM 14
 #define D3DFVF_CUSTOMVERTEX   (D3DFVF_XYZ|D3DFVF_TEX1)
@@ -129,11 +130,9 @@ typedef struct InputStream {
     uint64_t samples_decoded;
 } InputStream;
 
-
+void dxva2_uninit(AVCodecContext *s);
 int dxva2_init(AVCodecContext *s, HWND hwnd);
 //int dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame);
-
-
 
 struct CUSTOMVERTEX
 {
@@ -153,7 +152,7 @@ public:
 
 
 	BOOL HWAccelInit(AVCodec *codec, AVCodecContext *ctx, HWND hWnd);
-
+	void dxva2_uninit(AVCodecContext *s);
 	int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num);
 
 private:
