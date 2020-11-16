@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "VideoService.h"
-#include "YUVTools.h"
 #include "dxva.h"
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -14,8 +13,8 @@ extern "C" {
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-#define PLAY_URL "rtmp://192.168.8.244/live/screen"
-#define PLAY_URL2 "d:\\temp\\test.mp4"
+#define PLAY_URL "d:\\temp\\test_1280_720.mp4"
+#define PLAY_URL2 "d:\\temp\\test_1280_720.mp4"
 
 
 VideoService::VideoService()

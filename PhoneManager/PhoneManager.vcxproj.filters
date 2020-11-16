@@ -36,9 +36,6 @@
     <ClInclude Include="VideoService.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="YUVTools.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -51,9 +48,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="VideoService.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="YUVTools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

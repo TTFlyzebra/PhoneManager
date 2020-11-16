@@ -1,7 +1,9 @@
-﻿生成启动时间为 2020/11/13 星期五 11:34:25。
-     1>项目“D:\VCPRO\PhoneManager\PhoneManager\PhoneManager.vcxproj”在节点 2 上(Build 个目标)。
+﻿生成启动时间为 2020/11/13 23:21:06。
+     1>项目“D:\VCPRO\PhoneManager\PhoneManager\PhoneManager.vcxproj”在节点 2 上(Rebuild 个目标)。
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"x64\Debug\PhoneManager.pch" /Fo"x64\Debug\\" /Fd"x64\Debug\vc110.pdb" /Gd /TP /errorReport:prompt D3DUtils.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"x64\Debug\PhoneManager.pch" /Fo"x64\Debug\\" /Fd"x64\Debug\vc110.pdb" /Gd /TP /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /sdl /Od /D WIN32 /D _DEBUG /D _WINDOWS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"x64\Debug\PhoneManager.pch" /Fo"x64\Debug\\" /Fd"x64\Debug\vc110.pdb" /Gd /TP /errorReport:prompt D3DUtils.cpp PhoneManager.cpp VideoService.cpp
          D3DUtils.cpp
      1>d:\vcpro\phonemanager\ffmpeg\include\libavutil\rational.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
      1>D:\VCPRO\PhoneManager\ffmpeg\include\libavutil/rational.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
@@ -17,6 +19,20 @@
                  D3DUtils.cpp(460) : 使用“j”的定义
      1>D3DUtils.cpp(900): warning C4101: “ret”: 未引用的局部变量
      1>D3DUtils.cpp(899): warning C4101: “hr”: 未引用的局部变量
+         PhoneManager.cpp
+     1>d:\vcpro\phonemanager\ffmpeg\include\libavutil\rational.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+     1>D:\VCPRO\PhoneManager\ffmpeg\include\libavutil/rational.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+     1>PhoneManager.cpp(154): warning C4101: “tm”: 未引用的局部变量
+     1>PhoneManager.cpp(156): warning C4101: “height”: 未引用的局部变量
+     1>PhoneManager.cpp(155): warning C4101: “width”: 未引用的局部变量
+         VideoService.cpp
+     1>d:\vcpro\phonemanager\ffmpeg\include\libavutil\rational.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+     1>D:\VCPRO\PhoneManager\ffmpeg\include\libavutil/rational.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+     1>VideoService.cpp(115): warning C4018: “<”: 有符号/无符号不匹配
+     1>VideoService.cpp(79): warning C4101: “pps”: 未引用的局部变量
+     1>VideoService.cpp(85): warning C4101: “fly_frame”: 未引用的局部变量
+     1>VideoService.cpp(78): warning C4101: “sps”: 未引用的局部变量
+         正在生成代码...
        ResourceCompile:
          C:\Program Files (x86)\Windows Kits\8.0\bin\x86\rc.exe /l"0x0409" /nologo /fo"x64\Debug\PhoneManager.res" PhoneManager.rc 
        Link:
@@ -25,43 +41,19 @@
          x64\Debug\PhoneManager.obj
          x64\Debug\stdafx.obj
          x64\Debug\VideoService.obj
-         x64\Debug\YUVTools.obj
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 Direct3DCreate9，该符号在函数 "public: long __cdecl D3DUtils::InitD3D(struct HWND__ *,int,int)" (?InitD3D@D3DUtils@@QEAAJPEAUHWND__@@HH@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 D3DXMatrixLookAtLH，该符号在函数 "public: long __cdecl D3DUtils::InitD3D(struct HWND__ *,int,int)" (?InitD3D@D3DUtils@@QEAAJPEAUHWND__@@HH@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 D3DXMatrixPerspectiveFovLH，该符号在函数 "public: long __cdecl D3DUtils::InitD3D(struct HWND__ *,int,int)" (?InitD3D@D3DUtils@@QEAAJPEAUHWND__@@HH@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 D3DXCreateTexture，该符号在函数 "public: void __cdecl D3DUtils::RenderRGB32(unsigned char *,int,int,int,int)" (?RenderRGB32@D3DUtils@@QEAAXPEAEHHHH@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 D3DXCreateTextureFromFileA，该符号在函数 "public: long __cdecl D3DUtils::InitD3D(struct HWND__ *,int,int)" (?InitD3D@D3DUtils@@QEAAJPEAUHWND__@@HH@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 av_mallocz，该符号在函数 "int __cdecl dxva2_get_buffer(struct AVCodecContext *,struct AVFrame *,int)" (?dxva2_get_buffer@@YAHPEAUAVCodecContext@@PEAUAVFrame@@H@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 av_free，该符号在函数 "void __cdecl dxva2_release_buffer(void *,unsigned char *)" (?dxva2_release_buffer@@YAXPEAXPEAE@Z) 中被引用
-     1>VideoService.obj : error LNK2001: 无法解析的外部符号 av_free
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 av_freep，该符号在函数 "void __cdecl dxva2_destroy_decoder(struct AVCodecContext *)" (?dxva2_destroy_decoder@@YAXPEAUAVCodecContext@@@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 av_log，该符号在函数 "int __cdecl dxva2_init(struct AVCodecContext *,struct HWND__ *)" (?dxva2_init@@YAHPEAUAVCodecContext@@PEAUHWND__@@@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 av_buffer_create，该符号在函数 "int __cdecl dxva2_get_buffer(struct AVCodecContext *,struct AVFrame *,int)" (?dxva2_get_buffer@@YAHPEAUAVCodecContext@@PEAUAVFrame@@H@Z) 中被引用
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 av_frame_alloc，该符号在函数 "int __cdecl dxva2_alloc(struct AVCodecContext *,struct HWND__ *)" (?dxva2_alloc@@YAHPEAUAVCodecContext@@PEAUHWND__@@@Z) 中被引用
-     1>VideoService.obj : error LNK2001: 无法解析的外部符号 av_frame_alloc
-     1>D3DUtils.obj : error LNK2019: 无法解析的外部符号 av_frame_free，该符号在函数 "void __cdecl dxva2_uninit(struct AVCodecContext *)" (?dxva2_uninit@@YAXPEAUAVCodecContext@@@Z) 中被引用
-     1>VideoService.obj : error LNK2001: 无法解析的外部符号 av_frame_free
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 av_malloc，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 av_dict_set，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 av_dict_free，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avcodec_alloc_context3，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avcodec_parameters_to_context，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avcodec_open2，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avcodec_close，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 av_packet_unref，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avcodec_find_decoder，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avcodec_send_packet，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avcodec_receive_frame，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 av_register_all，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avformat_network_init，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avformat_alloc_context，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avformat_open_input，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avformat_find_stream_info，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 av_read_frame，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>VideoService.obj : error LNK2019: 无法解析的外部符号 avformat_close_input，该符号在函数 "private: unsigned long __cdecl VideoService::ffplay(void)" (?ffplay@VideoService@@AEAAKXZ) 中被引用
-     1>D:\VCPRO\PhoneManager\x64\Debug\PhoneManager.exe : fatal error LNK1120: 30 个无法解析的外部命令
-     1>已完成生成项目“D:\VCPRO\PhoneManager\PhoneManager\PhoneManager.vcxproj”(Build 个目标)的操作 - 失败。
+     1>yuv.lib(convert_argb.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(convert_argb.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(convert_to_argb.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(convert_to_argb.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(cpu_id.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(cpu_id.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(planar_functions.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(planar_functions.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(rotate_argb.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(rotate_argb.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(row_any.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(row_any.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(row_common.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(row_common.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(row_win.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(row_win.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(scale_common.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(scale_common.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+     1>yuv.lib(video_common.obj) : warning LNK4099: 未找到 PDB“vc110.pdb”(使用“yuv.lib(video_common.obj)”或在“D:\VCPRO\PhoneManager\x64\Debug\vc110.pdb”中寻找)；正在链接对象，如同没有调试信息一样
+         PhoneManager.vcxproj -> D:\VCPRO\PhoneManager\x64\Debug\PhoneManager.exe
+     1>已完成生成项目“D:\VCPRO\PhoneManager\PhoneManager\PhoneManager.vcxproj”(Rebuild 个目标)的操作。
 
-生成失败。
+生成成功。
 
-已用时间 00:00:00.94
+已用时间 00:00:02.66

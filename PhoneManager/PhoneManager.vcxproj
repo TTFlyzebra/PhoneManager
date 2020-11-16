@@ -41,7 +41,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -68,16 +68,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\VCPRO\PhoneManager\libyuv\x86\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\VCPRO\PhoneManager\ffmpeg\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\VCPRO\PhoneManager\libyuv\x86\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;D:\VCPRO\PhoneManager\ffmpeg\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\VCPRO\PhoneManager\libyuv\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\VCPRO\PhoneManager\ffmpeg\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VCPRO\PhoneManager\libyuv\lib\x86;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;D:\VCPRO\PhoneManager\ffmpeg\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\VCPRO\PhoneManager\libyuv\x64\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\VCPRO\PhoneManager\ffmpeg\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\VCPRO\PhoneManager\libyuv\x64\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;D:\VCPRO\PhoneManager\ffmpeg\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\VCPRO\PhoneManager\libyuv\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\VCPRO\PhoneManager\ffmpeg\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VCPRO\PhoneManager\libyuv\lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;D:\VCPRO\PhoneManager\ffmpeg\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\VCPRO\PhoneManager\libyuv\include;D:\VCPRO\PhoneManager\ffmpeg\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;D:\VCPRO\PhoneManager\libyuv\lib\x86;D:\VCPRO\PhoneManager\ffmpeg\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -127,6 +129,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,6 +148,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;swresample.lib;swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -156,7 +161,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="VideoService.h" />
-    <ClInclude Include="YUVTools.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3DUtils.cpp" />
@@ -168,7 +172,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="VideoService.cpp" />
-    <ClCompile Include="YUVTools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PhoneManager.rc" />

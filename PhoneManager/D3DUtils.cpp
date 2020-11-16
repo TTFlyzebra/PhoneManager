@@ -737,7 +737,7 @@ HRESULT D3DUtils::InitD3D( HWND hWnd, int width, int height )
 	D3DXMatrixIdentity( &matWorld );
 	g_pd3dDevice->SetTransform( D3DTS_WORLD, &matWorld );
 	//创建并设置观察矩阵
-	D3DXVECTOR3 vEyePt( 0.0f, 0.0f, -50.f );
+	D3DXVECTOR3 vEyePt( 0.0f, 0.0f, -200.f );
 	D3DXVECTOR3 vLookatPt( 0.0f, 0.0f, 0.0f );
 	D3DXVECTOR3 vUpVec( 0.0f, 1.0f, 0.0f );
 	D3DXMATRIXA16 matView;
@@ -758,12 +758,12 @@ HRESULT D3DUtils::InitD3D( HWND hWnd, int width, int height )
 
 	for(int i=0;i<MAX_NUM;i++){		
 		//顶点数据
-		float left = 1.0f+(i%7)*99.0f/(14/2.0f) - 50.0f;
-		float right = left+(99.0f/(14/2.0f)-1.0f);
+		float left = 1.0f+(i%7)*399.0f/(14/2.0f) - 200.0f;
+		float right = left+(399.0f/(14/2.0f)-1.0f);
 		float t_height = (right-left)*16.0f/9.0f*(float)width/(float)height;
 		float top = 0;
 		float bottom = 0;
-		float start = 50.0f - (100.0f - 2.0f *t_height - 1.0f*width/height)/2.0f;
+		float start = 200.0f - (400.0f - 2.0f *t_height - 1.0f*width/height)/2.0f;
 		if(i/(14/2)==0){			
 			top = start;
 			bottom = start - t_height;
@@ -898,39 +898,15 @@ int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int nu
 	D3DLOCKED_RECT     objLockedRect;
 	HRESULT            hr;
 	int                ret;
+	
 
-	//EnterCriticalSection(&cs);
-	//ctx->d3d9device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-	//ctx->d3d9device->BeginScene();
-	//if (m_pBackBuffer)
-	//{
-	//	m_pBackBuffer->Release();
-	//	m_pBackBuffer = NULL;
-	//}
-	//ctx->d3d9device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_pBackBuffer);
-	//ctx->d3d9device->StretchRect(surface, NULL, m_pBackBuffer, NULL, D3DTEXF_LINEAR);
-	//ctx->d3d9device->EndScene();
-	//ctx->d3d9device->Present(NULL, NULL, NULL, NULL);
-	//LeaveCriticalSection(&cs);
-	//return 0;
+	EnterCriticalSection(&cs);	
 	if(g_pTexture[num]==NULL){
 		D3DXCreateTexture(g_pd3dDevice, frame->width, frame->height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &g_pTexture[num]);
 	}
-	EnterCriticalSection(&cs);
 	surface->GetDesc(&surfaceDesc);
     surface->LockRect(&srcLockedRect, NULL, D3DLOCK_READONLY);	
-
 	g_pTexture[num]->LockRect(0, &objLockedRect, NULL, 0);
-	//libyuv::NV12ToARGB(
-	//	  (const uint8_t*)srcLockedRect.pBits,
-    //       srcLockedRect.Pitch,
-    //       (const uint8_t*)srcLockedRect.pBits+srcLockedRect.Pitch*surfaceDesc.Height,
-    //       srcLockedRect.Pitch/2,
-    //       (uint8_t*) objLockedRect.pBits,
-    //       objLockedRect.Pitch,
-    //       objLockedRect.Pitch/4,
-    //       surfaceDesc.Height);
-	//
 	libyuv::ConvertToARGB(
 		(const uint8_t*)srcLockedRect.pBits,
 		srcLockedRect.Pitch*surfaceDesc.Height * 3 /2,
@@ -947,6 +923,7 @@ int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int nu
 	g_pTexture[num]->UnlockRect(0);
 	surface->UnlockRect();
 	if(num==0){
+		g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 50, 170), 1.0f, 0);
 		g_pd3dDevice->BeginScene();
 		for(int i=0;i<MAX_NUM;i++) {			
 			if(g_pTexture[0]!=NULL){				
