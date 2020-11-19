@@ -50,7 +50,6 @@ DEFINE_GUID(GUID_NULL, 0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00,
 typedef IDirect3D9* WINAPI pDirect3DCreate9(UINT);
 typedef HRESULT WINAPI pCreateDeviceManager9(UINT *, IDirect3DDeviceManager9 **);
 
-CRITICAL_SECTION cs;
 
 typedef struct dxva2_mode {
 	const GUID     *guid;
@@ -142,7 +141,7 @@ static void dxva2_destroy_decoder(AVCodecContext *s)
 	}
 }
 
-static void dxva2_uninit(AVCodecContext *s)
+void D3DUtils::dxva2_uninit(AVCodecContext *s)
 {
 	InputStream  *ist = (InputStream  *)s->opaque;
 	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
@@ -182,12 +181,9 @@ static void dxva2_uninit(AVCodecContext *s)
 
 	av_freep(&ist->hwaccel_ctx);
 	av_freep(&s->hwaccel_context);
-
-	DeleteCriticalSection(&cs);
-
 }
 
-static void dxva2_release_buffer(void *opaque, uint8_t *data)
+void D3DUtils::dxva2_release_buffer(void *opaque, uint8_t *data)
 {
 	DXVA2SurfaceWrapper *w = (DXVA2SurfaceWrapper *)opaque;
 	DXVA2Context        *ctx = w->ctx;
@@ -205,7 +201,7 @@ static void dxva2_release_buffer(void *opaque, uint8_t *data)
 	av_free(w);
 }
 
-static int dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
+int D3DUtils::dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
 {
 	InputStream  *ist = (InputStream  *)s->opaque;
 	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
@@ -261,7 +257,7 @@ IDirect3DSurface9 * m_pDirect3DSurfaceRender = NULL;
 IDirect3DSurface9 * m_pBackBuffer = NULL;
 
 
-static int dxva2_alloc(AVCodecContext *s, HWND hwnd)
+int D3DUtils::dxva2_alloc(AVCodecContext *s, HWND hwnd)
 {
 	InputStream *ist = (InputStream *)s->opaque;
 	int loglevel = (ist->hwaccel_id == HWACCEL_AUTO) ? AV_LOG_VERBOSE : AV_LOG_ERROR;
@@ -606,9 +602,9 @@ fail:
 	return AVERROR(EINVAL);
 }
 
-int dxva2_init(AVCodecContext *s, HWND hwnd)
+int D3DUtils::dxva2_init(AVCodecContext *s, HWND hwnd)
 {
-	InitializeCriticalSection(&cs);
+	//InitializeCriticalSection(&cs);
 
 	InputStream *ist = (InputStream *)s->opaque;
 	int loglevel = (ist->hwaccel_id == HWACCEL_AUTO) ? AV_LOG_VERBOSE : AV_LOG_ERROR;
@@ -658,7 +654,7 @@ D3DUtils::~D3DUtils(void)
 {
 }
 
-AVPixelFormat GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts)
+AVPixelFormat D3DUtils::GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts)
 {
 	InputStream* ist = (InputStream*)s->opaque;
 	ist->active_hwaccel_id = HWACCEL_DXVA2;

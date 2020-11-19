@@ -130,10 +130,6 @@ typedef struct InputStream {
     uint64_t samples_decoded;
 } InputStream;
 
-void dxva2_uninit(AVCodecContext *s);
-int dxva2_init(AVCodecContext *s, HWND hwnd);
-//int dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame);
-
 struct CUSTOMVERTEX
 {
     FLOAT x, y, z;       //顶点位置  
@@ -150,20 +146,24 @@ public:
 	void Cleanup();
 	void RenderRGB32(uint8_t *yuv,int widht, int height, int size, int num);
 
-
 	BOOL HWAccelInit(AVCodec *codec, AVCodecContext *ctx, HWND hWnd);
-	void dxva2_uninit(AVCodecContext *s);
-	int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num);
+	int dxva2_init(AVCodecContext *s, HWND hwnd);
+	int dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num);
+	int dxva2_alloc(AVCodecContext *s, HWND hwnd);	
+	
+	static AVPixelFormat GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts);
+	static void dxva2_uninit(AVCodecContext *s);
+    static int dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags);
+	static void dxva2_release_buffer(void *opaque, uint8_t *data);
+	
 
 private:
 	LPDIRECT3D9             g_pD3D;    //Direct3D对象
 	LPDIRECT3DDEVICE9       g_pd3dDevice;    //Direct3D设备对象
-
 	LPDIRECT3DVERTEXBUFFER9 g_pVB[MAX_NUM];    //顶点缓冲区对象
 	LPDIRECT3DTEXTURE9      g_pTexture[MAX_NUM];    //纹理对象
-
 	LPDIRECT3DTEXTURE9		_dfTexture;
 
-	CRITICAL_SECTION cs;
+	CRITICAL_SECTION		cs;
 };
 

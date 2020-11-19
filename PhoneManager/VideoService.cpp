@@ -13,8 +13,8 @@ extern "C" {
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-#define PLAY_URL "d:\\temp\\test_1280_720.mp4"
-#define PLAY_URL2 "d:\\temp\\test_1280_720.mp4"
+#define PLAY_URL "d:\\temp\\test_720_1280_12.mp4"
+#define PLAY_URL2 "d:\\temp\\test_720_1280_12.mp4"
 
 
 VideoService::VideoService()
@@ -292,6 +292,7 @@ DWORD VideoService::ffplay()
 	}
 
 	//	av_free(audio_buf);	
+	//mD3DUtils->dxva2_uninit(pCodecCtx_video);
 	av_free(packet);
 	av_frame_free(&frame);
 	avcodec_close(pCodecCtx_video);
