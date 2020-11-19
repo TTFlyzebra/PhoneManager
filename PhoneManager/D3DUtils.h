@@ -150,11 +150,13 @@ public:
 	int dxva2_init(AVCodecContext *s, HWND hwnd);
 	int dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num);
 	int dxva2_alloc(AVCodecContext *s, HWND hwnd);	
-	
+
+	static void dxva2_destroy_decoder(AVCodecContext *s);	
 	static AVPixelFormat GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts);
 	static void dxva2_uninit(AVCodecContext *s);
     static int dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags);
-	static void dxva2_release_buffer(void *opaque, uint8_t *data);
+	static void dxva2_release_buffer(void *opaque, uint8_t *data);	
+	static int D3DUtils::dxva2_create_decoder(AVCodecContext *s);
 	
 
 private:
@@ -165,5 +167,10 @@ private:
 	LPDIRECT3DTEXTURE9		_dfTexture;
 
 	CRITICAL_SECTION		cs;
+
+	D3DPRESENT_PARAMETERS d3dpp;
+	RECT m_rtViewport;
+	IDirect3DSurface9		*m_pDirect3DSurfaceRender;
+	IDirect3DSurface9		*m_pBackBuffer;
 };
 

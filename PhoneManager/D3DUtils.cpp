@@ -117,7 +117,7 @@ typedef struct DXVA2SurfaceWrapper {
 	IDirectXVideoDecoder *decoder;
 } DXVA2SurfaceWrapper;
 
-static void dxva2_destroy_decoder(AVCodecContext *s)
+void D3DUtils::dxva2_destroy_decoder(AVCodecContext *s)
 {
 	InputStream  *ist = (InputStream *)s->opaque;
 	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
@@ -228,9 +228,7 @@ int D3DUtils::dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
 	if (!w)
 		return AVERROR(ENOMEM);
 
-	frame->buf[0] = av_buffer_create((uint8_t*)surface, 0,
-		dxva2_release_buffer, w,
-		AV_BUFFER_FLAG_READONLY);
+	frame->buf[0] = av_buffer_create((uint8_t*)surface, 0, dxva2_release_buffer, w, AV_BUFFER_FLAG_READONLY);
 	if (!frame->buf[0]) {
 		av_free(w);
 		return AVERROR(ENOMEM);
@@ -250,12 +248,6 @@ int D3DUtils::dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
 
 	return 0;
 }
-
-D3DPRESENT_PARAMETERS d3dpp = { 0 };
-RECT m_rtViewport;
-IDirect3DSurface9 * m_pDirect3DSurfaceRender = NULL;
-IDirect3DSurface9 * m_pBackBuffer = NULL;
-
 
 int D3DUtils::dxva2_alloc(AVCodecContext *s, HWND hwnd)
 {
@@ -445,8 +437,8 @@ static const d3d_format_t *D3dFindFormat(D3DFORMAT format)
 	return NULL;
 }
 
-D3DFORMAT target_format = D3DFMT_X8R8G8B8;
-static int dxva2_create_decoder(AVCodecContext *s)
+
+int D3DUtils::dxva2_create_decoder(AVCodecContext *s)
 {
 	InputStream  *ist = (InputStream *)s->opaque;
 	int loglevel = (ist->hwaccel_id == HWACCEL_AUTO) ? AV_LOG_VERBOSE : AV_LOG_ERROR;
@@ -460,6 +452,7 @@ static int dxva2_create_decoder(AVCodecContext *s)
 	HRESULT hr;
 	int surface_alignment;
 	int ret;
+	D3DFORMAT target_format = D3DFMT_X8R8G8B8;
 
 	hr = ctx->decoder_service->GetDecoderDeviceGuids(&guid_count, &guid_list);
 	if (FAILED(hr)) {
@@ -613,8 +606,10 @@ int D3DUtils::dxva2_init(AVCodecContext *s, HWND hwnd)
 
 	if (!ist->hwaccel_ctx && hwnd != NULL) {
 		ret = dxva2_alloc(s,hwnd);
-		if (ret < 0)
+		if (ret < 0){
+			printf("dxva2_alloc Failed! ret=%d\n",ret);
 			return ret;
+		}
 	}
 	ctx = (DXVA2Context *)ist->hwaccel_ctx;
 
@@ -646,6 +641,10 @@ D3DUtils::D3DUtils(void)
 		g_pVB[i]=NULL;    //顶点缓冲区对象
 		g_pVB[i]=NULL;    //顶点缓冲区对象
 	}
+
+	m_pDirect3DSurfaceRender = NULL;
+	m_pBackBuffer = NULL;
+
 	InitializeCriticalSection(&cs);
 }
 
