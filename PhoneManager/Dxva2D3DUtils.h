@@ -137,11 +137,11 @@ struct CUSTOMVERTEX
 };
 
 
-class D3DUtils
+class Dxva2D3DUtils
 {
 public:
-	D3DUtils(void);
-	~D3DUtils(void);
+	Dxva2D3DUtils(void);
+	~Dxva2D3DUtils(void);
 	HRESULT InitD3D( HWND hWnd, int width, int height );
 	void Cleanup();
 	void RenderRGB32(uint8_t *yuv,int widht, int height, int size, int num);
@@ -156,7 +156,7 @@ public:
 	static void dxva2_uninit(AVCodecContext *s);
     static int dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags);
 	static void dxva2_release_buffer(void *opaque, uint8_t *data);	
-	static int D3DUtils::dxva2_create_decoder(AVCodecContext *s);
+	static int Dxva2D3DUtils::dxva2_create_decoder(AVCodecContext *s);
 	
 
 private:

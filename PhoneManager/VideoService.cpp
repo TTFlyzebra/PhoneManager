@@ -13,8 +13,8 @@ extern "C" {
 #define MAX_DBG_MSG_LEN (1024)
 char pformat[MAX_DBG_MSG_LEN];
 
-#define PLAY_URL "d:\\temp\\test_720_1280_12.mp4"
-#define PLAY_URL2 "d:\\temp\\test_720_1280_12.mp4"
+#define PLAY_URL "rtmp://192.168.8.244/live/screen"
+#define PLAY_URL2 "rtmp://192.168.8.244/live/screen"
 
 
 VideoService::VideoService()
@@ -32,10 +32,10 @@ VideoService::~VideoService(void)
 }
 
 
-void VideoService::start(HWND hwnd, D3DUtils *mD3DUtils,int my_num)
+void VideoService::start(HWND hwnd, Dxva2D3DUtils *mDxva2D3DUtils,int my_num)
 {
 	this->mHwnd = hwnd;
-	this->mD3DUtils = mD3DUtils;
+	this->mDxva2D3DUtils = mDxva2D3DUtils;
 	this->myNUM = my_num;
 	isStop = false;	
 	pid_ffplay = CreateThread(NULL, 0, &VideoService::ffplayThread, this, CREATE_SUSPENDED, NULL);
@@ -232,7 +232,7 @@ DWORD VideoService::ffplay()
 	//	NULL                   // param
 	//	);  
 
-	BOOL bRet = mD3DUtils->HWAccelInit(pCodec_video, pCodecCtx_video, mHwnd);
+	BOOL bRet = mDxva2D3DUtils->HWAccelInit(pCodec_video, pCodecCtx_video, mHwnd);
 	if (!bRet){
 		OutputDebugString("VideoService HWAccelInit error.\n");
 	}
@@ -252,7 +252,7 @@ DWORD VideoService::ffplay()
 				ret = avcodec_receive_frame(pCodecCtx_video, frame);
 				if (ret >= 0) {
 					//Ó²½â
-					mD3DUtils->dxva2_retrieve_data_call(pCodecCtx_video, frame, myNUM);
+					mDxva2D3DUtils->dxva2_retrieve_data_call(pCodecCtx_video, frame, myNUM);
 					//sws_scale(sws_ctx,                                  // sws context
 					//	(const uint8_t *const *)frame->data,  // src slice
 					//	frame->linesize,                      // src stride
@@ -263,7 +263,7 @@ DWORD VideoService::ffplay()
 					//	);			
 					//uint8_t * video_buf = (uint8_t *) malloc((width*height* 4) * sizeof(uint8_t));				
 					//yuv420pToRGB32(frame->data[0],frame->data[1],frame->data[2],width,height,width,video_buf);
-					//mD3DUtils->RenderRGB32(video_buf,width,height,width*height*4, myNUM);	
+					//mDxva2D3DUtils->RenderRGB32(video_buf,width,height,width*height*4, myNUM);	
 					//free(video_buf);
 				}
 			}
@@ -292,7 +292,7 @@ DWORD VideoService::ffplay()
 	}
 
 	//	av_free(audio_buf);	
-	//mD3DUtils->dxva2_uninit(pCodecCtx_video);
+	//mDxva2D3DUtils->dxva2_uninit(pCodecCtx_video);
 	av_free(packet);
 	av_frame_free(&frame);
 	avcodec_close(pCodecCtx_video);

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "D3DUtils.h"
+#include "Dxva2D3DUtils.h"
 
 #include <d3d9.h>
 #include <dxva2api.h>
@@ -117,7 +117,7 @@ typedef struct DXVA2SurfaceWrapper {
 	IDirectXVideoDecoder *decoder;
 } DXVA2SurfaceWrapper;
 
-void D3DUtils::dxva2_destroy_decoder(AVCodecContext *s)
+void Dxva2D3DUtils::dxva2_destroy_decoder(AVCodecContext *s)
 {
 	InputStream  *ist = (InputStream *)s->opaque;
 	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
@@ -141,7 +141,7 @@ void D3DUtils::dxva2_destroy_decoder(AVCodecContext *s)
 	}
 }
 
-void D3DUtils::dxva2_uninit(AVCodecContext *s)
+void Dxva2D3DUtils::dxva2_uninit(AVCodecContext *s)
 {
 	InputStream  *ist = (InputStream  *)s->opaque;
 	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
@@ -183,7 +183,7 @@ void D3DUtils::dxva2_uninit(AVCodecContext *s)
 	av_freep(&s->hwaccel_context);
 }
 
-void D3DUtils::dxva2_release_buffer(void *opaque, uint8_t *data)
+void Dxva2D3DUtils::dxva2_release_buffer(void *opaque, uint8_t *data)
 {
 	DXVA2SurfaceWrapper *w = (DXVA2SurfaceWrapper *)opaque;
 	DXVA2Context        *ctx = w->ctx;
@@ -201,7 +201,7 @@ void D3DUtils::dxva2_release_buffer(void *opaque, uint8_t *data)
 	av_free(w);
 }
 
-int D3DUtils::dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
+int Dxva2D3DUtils::dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
 {
 	InputStream  *ist = (InputStream  *)s->opaque;
 	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
@@ -249,7 +249,7 @@ int D3DUtils::dxva2_get_buffer(AVCodecContext *s, AVFrame *frame, int flags)
 	return 0;
 }
 
-int D3DUtils::dxva2_alloc(AVCodecContext *s, HWND hwnd)
+int Dxva2D3DUtils::dxva2_alloc(AVCodecContext *s, HWND hwnd)
 {
 	InputStream *ist = (InputStream *)s->opaque;
 	int loglevel = (ist->hwaccel_id == HWACCEL_AUTO) ? AV_LOG_VERBOSE : AV_LOG_ERROR;
@@ -438,7 +438,7 @@ static const d3d_format_t *D3dFindFormat(D3DFORMAT format)
 }
 
 
-int D3DUtils::dxva2_create_decoder(AVCodecContext *s)
+int Dxva2D3DUtils::dxva2_create_decoder(AVCodecContext *s)
 {
 	InputStream  *ist = (InputStream *)s->opaque;
 	int loglevel = (ist->hwaccel_id == HWACCEL_AUTO) ? AV_LOG_VERBOSE : AV_LOG_ERROR;
@@ -595,7 +595,7 @@ fail:
 	return AVERROR(EINVAL);
 }
 
-int D3DUtils::dxva2_init(AVCodecContext *s, HWND hwnd)
+int Dxva2D3DUtils::dxva2_init(AVCodecContext *s, HWND hwnd)
 {
 	//InitializeCriticalSection(&cs);
 
@@ -632,7 +632,7 @@ int D3DUtils::dxva2_init(AVCodecContext *s, HWND hwnd)
 }
 
 
-D3DUtils::D3DUtils(void)
+Dxva2D3DUtils::Dxva2D3DUtils(void)
 {
 	g_pD3D=NULL;    //Direct3D对象
 	g_pd3dDevice=NULL;    //Direct3D设备对象
@@ -649,11 +649,11 @@ D3DUtils::D3DUtils(void)
 }
 
 
-D3DUtils::~D3DUtils(void)
+Dxva2D3DUtils::~Dxva2D3DUtils(void)
 {
 }
 
-AVPixelFormat D3DUtils::GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts)
+AVPixelFormat Dxva2D3DUtils::GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_fmts)
 {
 	InputStream* ist = (InputStream*)s->opaque;
 	ist->active_hwaccel_id = HWACCEL_DXVA2;
@@ -661,7 +661,7 @@ AVPixelFormat D3DUtils::GetHwFormat(AVCodecContext *s, const AVPixelFormat *pix_
 	return ist->hwaccel_pix_fmt;
 }
 
-BOOL D3DUtils::HWAccelInit(AVCodec *codec, AVCodecContext *ctx, HWND hWnd)
+BOOL Dxva2D3DUtils::HWAccelInit(AVCodec *codec, AVCodecContext *ctx, HWND hWnd)
 {
 	bool bRet = TRUE;
 	switch (codec->id)
@@ -709,7 +709,7 @@ BOOL D3DUtils::HWAccelInit(AVCodec *codec, AVCodecContext *ctx, HWND hWnd)
 //-----------------------------------------------------------------------------
 // Desc: 初始化Direct3D
 //-----------------------------------------------------------------------------
-HRESULT D3DUtils::InitD3D( HWND hWnd, int width, int height )
+HRESULT Dxva2D3DUtils::InitD3D( HWND hWnd, int width, int height )
 {
 	//创建Direct3D对象, 该对象用于创建Direct3D设备对象
 	if(NULL == (g_pD3D = Direct3DCreate9(D3D_SDK_VERSION ))) return E_FAIL;
@@ -766,19 +766,19 @@ HRESULT D3DUtils::InitD3D( HWND hWnd, int width, int height )
 			top = start - t_height - 1.0f*width/height;
 			bottom = start - 2.0f *t_height - 1.0f*width/height;
 		}
-		//CUSTOMVERTEX g_Vertices[] =	{
-		//	{ -50, -50,  0.0f,  0.0f, 1.0f},   
-		//	{ -50,  50,  0.0f,  0.0f, 0.0f},    
-		//	{  50, -50,  0.0f,  1.0f, 1.0f},    
-		//	{  50,  50,  0.0f,  1.0f, 0.0f}	
-		//};
-		CUSTOMVERTEX g_Vertices[] =
-		{
-			{left,   bottom, 0.0f,  0.0f, 1.0f},   
-			{left,   top,    0.0f,  0.0f, 0.0f},    
-			{right,  bottom, 0.0f,  1.0f, 1.0f},    
-			{right,  top,    0.0f,  1.0f, 0.0f}	
+		CUSTOMVERTEX g_Vertices[] =	{
+			{ -200.0f, -200.0f,  0.0f,  0.0f, 1.0f},   
+			{ -200.0f,  200.0f,  0.0f,  0.0f, 0.0f},    
+			{  200.0f, -200.0f,  0.0f,  1.0f, 1.0f},    
+			{  200.0f,  200.0f,  0.0f,  1.0f, 0.0f}	
 		};
+		//CUSTOMVERTEX g_Vertices[] =
+		//{
+		//	{left,   bottom, 0.0f,  0.0f, 1.0f},   
+		//	{left,   top,    0.0f,  0.0f, 0.0f},    
+		//	{right,  bottom, 0.0f,  1.0f, 1.0f},    
+		//	{right,  top,    0.0f,  1.0f, 0.0f}	
+		//};
 
 		//创建顶点缓冲区
 		if( FAILED( g_pd3dDevice->CreateVertexBuffer(4*sizeof(CUSTOMVERTEX),0, D3DFVF_CUSTOMVERTEX,D3DPOOL_MANAGED, &g_pVB[i],NULL)))
@@ -798,7 +798,7 @@ HRESULT D3DUtils::InitD3D( HWND hWnd, int width, int height )
 //-----------------------------------------------------------------------------
 // Desc: 释放创建的对象
 //-----------------------------------------------------------------------------
-void D3DUtils::Cleanup()
+void Dxva2D3DUtils::Cleanup()
 {	
 	for(int i=0;i<MAX_NUM;i++){
 		//释放纹理对象
@@ -821,7 +821,7 @@ void D3DUtils::Cleanup()
 // Desc: 渲染RGB32图形 
 //-----------------------------------------------------------------------------
 static DWORD lastPlayTime = 0;
-void D3DUtils::RenderRGB32(uint8_t *rgb32,int width, int height, int size, int num)
+void Dxva2D3DUtils::RenderRGB32(uint8_t *rgb32,int width, int height, int size, int num)
 {
 	EnterCriticalSection(&cs);
 	//新建一个纹理
@@ -883,7 +883,7 @@ void NV12_RGB32_SSE(const BYTE *yBuf, const BYTE *uvBuf, const int width, const 
 	//}
 }
 
-int D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num)
+int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num)
 {
 	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
 	InputStream  *ist = (InputStream  *)s->opaque;

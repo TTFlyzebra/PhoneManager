@@ -1,4 +1,4 @@
-#include "D3DUtils.h"
+#include "Dxva2D3DUtils.h"
 #pragma once
 
 static bool isRunning;
@@ -9,7 +9,7 @@ class VideoService
 public:
 	VideoService();
 	~VideoService(void);	
-	void start(HWND hwnd,D3DUtils *mD3DUtils, int my_num);
+	void start(HWND hwnd,Dxva2D3DUtils *mDxva2D3DUtils, int my_num);
 	void stop();
 private:    
 	int myNUM;
@@ -22,7 +22,7 @@ private:
 	static DWORD CALLBACK ffplayThread(LPVOID);
 	DWORD ffplay();
 
-	D3DUtils *mD3DUtils;
+	Dxva2D3DUtils *mDxva2D3DUtils;
 	HWND mHwnd;
 };
 

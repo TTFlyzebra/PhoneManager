@@ -30,10 +30,10 @@
     <ClInclude Include="PhoneManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="D3DUtils.h">
+    <ClInclude Include="VideoService.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="VideoService.h">
+    <ClInclude Include="Dxva2D3DUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,10 +44,10 @@
     <ClCompile Include="PhoneManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="D3DUtils.cpp">
+    <ClCompile Include="VideoService.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="VideoService.cpp">
+    <ClCompile Include="Dxva2D3DUtils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -159,7 +159,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D3DUtils.h" />
+    <ClInclude Include="Dxva2D3DUtils.h" />
     <ClInclude Include="PhoneManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -167,7 +167,7 @@
     <ClInclude Include="VideoService.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D3DUtils.cpp" />
+    <ClCompile Include="Dxva2D3DUtils.cpp" />
     <ClCompile Include="PhoneManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
