@@ -99,9 +99,7 @@
     </Link>
     <PostBuildEvent />
     <PreBuildEvent />
-    <PostBuildEvent>
-      <Command>editbin /SUBSYSTEM:CONSOLE $(OUTDIR)\$(ProjectName).exe</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -160,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dxva2D3DUtils.h" />
+    <ClInclude Include="FlyTools.h" />
     <ClInclude Include="PhoneManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -168,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dxva2D3DUtils.cpp" />
+    <ClCompile Include="FlyTools.cpp" />
     <ClCompile Include="PhoneManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

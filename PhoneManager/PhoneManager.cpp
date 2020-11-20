@@ -8,6 +8,7 @@
 #include "PhoneManager.h"
 #include "Dxva2D3DUtils.h"
 #include "VideoService.h"
+#include "FlyTools.h"
 
 #define MAX_LOADSTRING 100
 
@@ -162,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:		
 		RECT rect;
 		GetClientRect (hWnd, &rect) ;
-		OutputDebugString("WM_CREATE\n");
+		TRACE("WM_CREATE\n");
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
