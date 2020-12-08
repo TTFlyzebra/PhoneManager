@@ -12,8 +12,8 @@ extern "C" {
 };
 
 
-#define PLAY_URL "rtmp://192.168.8.244/live/screen"
-#define PLAY_URL2 "rtmp://192.168.8.244/live/screen"
+#define PLAY_URL "rtmp://192.168.8.30/live/screen5"
+#define PLAY_URL2 "rtmp://192.168.8.30/live/screen5"
 
 
 VideoService::VideoService()

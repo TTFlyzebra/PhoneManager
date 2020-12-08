@@ -766,19 +766,19 @@ HRESULT Dxva2D3DUtils::InitD3D( HWND hWnd, int width, int height )
 			top = start - t_height - 1.0f*width/height;
 			bottom = start - 2.0f *t_height - 1.0f*width/height;
 		}
-		CUSTOMVERTEX g_Vertices[] =	{
-			{ -200.0f, -200.0f,  0.0f,  0.0f, 1.0f},   
-			{ -200.0f,  200.0f,  0.0f,  0.0f, 0.0f},    
-			{  200.0f, -200.0f,  0.0f,  1.0f, 1.0f},    
-			{  200.0f,  200.0f,  0.0f,  1.0f, 0.0f}	
-		};
-		//CUSTOMVERTEX g_Vertices[] =
-		//{
-		//	{left,   bottom, 0.0f,  0.0f, 1.0f},   
-		//	{left,   top,    0.0f,  0.0f, 0.0f},    
-		//	{right,  bottom, 0.0f,  1.0f, 1.0f},    
-		//	{right,  top,    0.0f,  1.0f, 0.0f}	
+		//CUSTOMVERTEX g_Vertices[] =	{
+		//	{ -200.0f, -200.0f,  0.0f,  0.0f, 1.0f},   
+		//	{ -200.0f,  200.0f,  0.0f,  0.0f, 0.0f},    
+		//	{  200.0f, -200.0f,  0.0f,  1.0f, 1.0f},    
+		//	{  200.0f,  200.0f,  0.0f,  1.0f, 0.0f}	
 		//};
+		CUSTOMVERTEX g_Vertices[] =
+		{
+			{left,   bottom, 0.0f,  0.0f, 1.0f},   
+			{left,   top,    0.0f,  0.0f, 0.0f},    
+			{right,  bottom, 0.0f,  1.0f, 1.0f},    
+			{right,  top,    0.0f,  1.0f, 0.0f}	
+		};
 
 		//创建顶点缓冲区
 		if( FAILED( g_pd3dDevice->CreateVertexBuffer(4*sizeof(CUSTOMVERTEX),0, D3DFVF_CUSTOMVERTEX,D3DPOOL_MANAGED, &g_pVB[i],NULL)))

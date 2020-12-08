@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\android">
+      <UniqueIdentifier>{3cf0febf-35a2-4a02-82bf-05687ac53e83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\util">
+      <UniqueIdentifier>{c6f1afa3-e3f7-4bc3-95bc-3ceffd3103a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -39,6 +45,21 @@
     <ClInclude Include="FlyTools.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="android\input.h">
+      <Filter>头文件\android</Filter>
+    </ClInclude>
+    <ClInclude Include="android\keycodes.h">
+      <Filter>头文件\android</Filter>
+    </ClInclude>
+    <ClInclude Include="util\buffer_util.h">
+      <Filter>头文件\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="screen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -54,6 +75,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="FlyTools.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

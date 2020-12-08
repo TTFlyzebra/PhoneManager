@@ -113,21 +113,21 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		0, 0, 420, 754, NULL, NULL, hInstance, NULL);
+		0, 0, 1920, 1000, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
 		return FALSE;
 	}
-	ShowWindow(hWnd, nCmdShow);
-	//ShowWindow(hWnd, SW_MAXIMIZE);
+	//ShowWindow(hWnd, nCmdShow);
+	ShowWindow(hWnd, SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 	//初始化Direct3D 
 
 	RECT rect;
 	GetClientRect (hWnd, &rect) ;
 
-	if(FAILED( mDxva2D3DUtils.InitD3D( hWnd, 420,754 ) ) )
+	if(FAILED( mDxva2D3DUtils.InitD3D( hWnd, 1920,1000 ) ) )
 	{
 		MessageBox(NULL, "创建纹理失败", "InitD3D", MB_OK);
 	}
