@@ -436,7 +436,7 @@ DWORD CALLBACK Controller::socketThread(LPVOID lp)
 	mPtr->socket_lis = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (mPtr->socket_lis == INVALID_SOCKET)
 	{
-		TRACE("Controller socket error !");
+		TRACE("Controller socket error ! \n");
 		return -1;
 	} 		
 	sin.sin_family = AF_INET;
@@ -444,12 +444,12 @@ DWORD CALLBACK Controller::socketThread(LPVOID lp)
 	sin.sin_addr.S_un.S_addr = INADDR_ANY;
 	if (bind(mPtr->socket_lis, (LPSOCKADDR)&sin, sizeof(sin)) == SOCKET_ERROR)
 	{
-		TRACE("Controller bind error !");
+		TRACE("Controller bind error! \n");
 		return -1;
 	}
 	if (listen(mPtr->socket_lis, 5) == SOCKET_ERROR)
 	{
-		TRACE("Controller listen error !");
+		TRACE("Controller listen error! \n");
 		return -1;
 	}	
 	int nAddrlen = sizeof(remoteAddr);

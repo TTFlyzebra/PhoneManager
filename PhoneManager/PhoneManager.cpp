@@ -9,6 +9,7 @@
 #include "Dxva2D3DUtils.h"
 #include "VideoService.h"
 #include "FlyTools.h"
+#include "Controller.h"
 
 #define MAX_LOADSTRING 100
 
@@ -28,6 +29,10 @@ INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
 #define MAX_DBG_MSG_LEN (1024)
 char out[MAX_DBG_MSG_LEN];
+
+Controller mController;
+
+
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 					   _In_opt_ HINSTANCE hPrevInstance,
@@ -124,6 +129,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	UpdateWindow(hWnd);
 	//初始化Direct3D 
 
+	//初始化WSA
+	WORD sockVersion = MAKEWORD(2, 2);
+	WSADATA wsaData;
+	if (WSAStartup(sockVersion, &wsaData) != 0)
+	{
+		TRACE("WSAStartup error !\n");
+	}
+
 	RECT rect;
 	GetClientRect (hWnd, &rect) ;
 
@@ -131,6 +144,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	{
 		MessageBox(NULL, "创建纹理失败", "InitD3D", MB_OK);
 	}
+	mController.start(9008);
 	for(int i=0;i<MAX_NUM;i++){
 		mVideoService[i].start(hWnd, &mDxva2D3DUtils, i);
 	}
@@ -163,7 +177,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:		
 		RECT rect;
 		GetClientRect (hWnd, &rect) ;
-		TRACE("WM_CREATE\n");
+		TRACE("WM_CREATE\n");		
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
@@ -171,10 +185,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
+		mController.stop();
 		for(int i=0;i<MAX_NUM;i++){
 			mVideoService[i].stop();
 		}
 		mDxva2D3DUtils.Cleanup();
+		WSACleanup();
 		PostQuitMessage(0);		
 		break;
 	default:
