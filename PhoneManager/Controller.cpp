@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Controller.h"
 #include "FlyTools.h"
+#include "VideoService.h"
 #include <assert.h>
 #define EVENT_STOP (SDL_USEREVENT + 1)
 
@@ -396,6 +397,7 @@ void input_manager_process_touch(SOCKET socket, const SDL_TouchFingerEvent *even
 //Controller start
 Controller::Controller(void)
 {
+	mPort = 9008;
 	socket_lis = INVALID_SOCKET;
 	socket_cli = INVALID_SOCKET;
 	screen = &flyscreen;
@@ -414,10 +416,11 @@ Controller::~Controller(void)
 {
 }
 
-void Controller::start(int port)
+void Controller::start(HWND hwnd,Dxva2D3DUtils *mDxva2D3DUtils)
 {
-	isStop = false;
-	mPort = port;
+	this->mHwnd = hwnd;
+	this->mDxva2D3DUtils = mDxva2D3DUtils;
+	isStop = false;	
 	m_socketThread = CreateThread(NULL, 0, &Controller::socketThread, this, CREATE_SUSPENDED, NULL);  
 	if (NULL!= m_socketThread) {  
 		ResumeThread(m_socketThread);  
@@ -447,7 +450,7 @@ DWORD CALLBACK Controller::socketThread(LPVOID lp)
 		TRACE("Controller bind error! \n");
 		return -1;
 	}
-	if (listen(mPtr->socket_lis, 5) == SOCKET_ERROR)
+	if (listen(mPtr->socket_lis, 32) == SOCKET_ERROR)
 	{
 		TRACE("Controller listen error! \n");
 		return -1;
@@ -457,11 +460,19 @@ DWORD CALLBACK Controller::socketThread(LPVOID lp)
 	{
 		mPtr->socket_cli = accept(mPtr->socket_lis, (SOCKADDR *)&remoteAddr, &nAddrlen);
 		TRACE("Controller accept socke_cli=%d.\n",mPtr->socket_cli);
-		if(mPtr->socket_cli != INVALID_SOCKET){
-			mPtr->m_sendThread = CreateThread(NULL, 0, &Controller::sendThread, lp, CREATE_SUSPENDED, NULL);  
-			if (NULL!= mPtr->m_sendThread) {  
-				ResumeThread(mPtr->m_sendThread);  
-			}	
+		if(mPtr->socket_cli != INVALID_SOCKET){			
+			char buff[1024];
+			memset(buff,0,1024);
+			int len = recv(mPtr->socket_cli,buff,1024,0);
+			int id = atoi(buff);
+			id = (id/10-1)*7+id%10-1;
+			TRACE("Controller client id=%d\n",id);
+			VideoService *mVideoService = new VideoService();
+			mVideoService->start(mPtr->mHwnd,mPtr->mDxva2D3DUtils,id);
+			//mPtr->m_sendThread = CreateThread(NULL, 0, &Controller::sendThread, lp, CREATE_SUSPENDED, NULL);  
+			//if (NULL!= mPtr->m_sendThread) {  
+			//	ResumeThread(mPtr->m_sendThread);  
+			//}	
 		}else{
 			if(mPtr->socket_lis != INVALID_SOCKET){
 				closesocket(mPtr->socket_lis);

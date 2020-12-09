@@ -16,7 +16,7 @@ extern "C" {
 #pragma comment(lib,"d3dx9.lib")
 #pragma comment(lib,"yuv.lib") 
 
-#define MAX_NUM 10
+#define MAX_NUM 14
 #define D3DFVF_CUSTOMVERTEX   (D3DFVF_XYZ|D3DFVF_TEX1)
 typedef unsigned __int8 uint8_t;  
 

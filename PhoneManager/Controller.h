@@ -5,6 +5,7 @@
 #include "android\keycodes.h"
 #include "util\buffer_util.h"
 #include "screen.h"
+#include "Dxva2D3DUtils.h"
 #define CONTROL_MSG_MAX_SIZE (1 << 18) // 256k
 #define CONTROL_MSG_INJECT_TEXT_MAX_LENGTH 300
 #define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH (CONTROL_MSG_MAX_SIZE - 6)
@@ -66,7 +67,7 @@ class Controller
 public:
 	Controller(void);
 	~Controller(void);
-	void start(int port);
+	void start(HWND hwnd,Dxva2D3DUtils *mDxva2D3DUtils);
 	void stop();
 	void sendMouseMotionEvent(SDL_MouseMotionEvent *event);
 	void sendMouseWheelEvent(SDL_MouseWheelEvent *event);
@@ -87,6 +88,9 @@ private:
 	static DWORD CALLBACK sendThread(LPVOID);
 
 	SDL_Window *pWindow;
+
+	Dxva2D3DUtils *mDxva2D3DUtils;
+	HWND mHwnd;
 
 };
 

@@ -885,6 +885,10 @@ void NV12_RGB32_SSE(const BYTE *yBuf, const BYTE *uvBuf, const int width, const 
 
 int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, int num)
 {
+	if(num<0||num>=MAX_NUM) {
+		TRACE("id[%d] error!\n",num);
+		return 0;
+	}
 	LPDIRECT3DSURFACE9 surface = (LPDIRECT3DSURFACE9)frame->data[3];
 	InputStream  *ist = (InputStream  *)s->opaque;
 	DXVA2Context *ctx = (DXVA2Context *)ist->hwaccel_ctx;
@@ -917,11 +921,11 @@ int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, i
 		libyuv::FOURCC_NV12);
 	g_pTexture[num]->UnlockRect(0);
 	surface->UnlockRect();
-	if(num==0){
+	if(num==4){
 		g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 50, 170), 1.0f, 0);
 		g_pd3dDevice->BeginScene();
 		for(int i=0;i<MAX_NUM;i++) {			
-			if(g_pTexture[0]!=NULL){				
+			if(g_pTexture[i]!=NULL){				
 				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
 				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
 				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);

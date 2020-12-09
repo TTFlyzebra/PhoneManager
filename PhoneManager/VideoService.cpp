@@ -3,6 +3,7 @@
 #include "dxva.h"
 #include "FlyTools.h"
 extern "C" {
+#include <stdio.h>
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
@@ -12,8 +13,7 @@ extern "C" {
 };
 
 
-#define PLAY_URL "rtmp://192.168.1.88/live/screen"
-#define PLAY_URL2 "rtmp://192.168.1.88/live/screen"
+#define PLAY_URL "rtmp://192.168.8.244/live/screen_%d"
 
 
 VideoService::VideoService()
@@ -93,11 +93,15 @@ DWORD VideoService::ffplay()
 	AVDictionary* avdic = NULL;
 	//av_dict_set(&avdic, "probesize", "32", 0);
 	//av_dict_set(&avdic, "max_analyze_duration", "100000", 0);
-	int ret =  avformat_open_input(&pFormatCtx, myNUM%2==0?PLAY_URL:PLAY_URL2, nullptr, &avdic);	
+	char playurl[1024];
+	memset(playurl,0,1024);
+	sprintf(playurl,PLAY_URL,myNUM);
+	TRACE("VideoService Couldn't open url=%s\n", playurl);
+	int ret =  avformat_open_input(&pFormatCtx, playurl, nullptr, &avdic);	
 	
 	//av_dict_free(&avdic);
 	if (ret != 0) {
-		TRACE("VideoService Couldn't open url=%s, (ret:%d)\n", PLAY_URL, ret);
+		TRACE("VideoService Couldn't open url=%s, (ret:%d)\n", playurl, ret);
 		return -1;
 	}
 	int totalSec = static_cast<int>(pFormatCtx->duration / AV_TIME_BASE);
