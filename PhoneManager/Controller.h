@@ -6,6 +6,7 @@
 #include "util\buffer_util.h"
 #include "screen.h"
 #include "Dxva2D3DUtils.h"
+#include "VideoService.h"
 #define CONTROL_MSG_MAX_SIZE (1 << 18) // 256k
 #define CONTROL_MSG_INJECT_TEXT_MAX_LENGTH 300
 #define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH (CONTROL_MSG_MAX_SIZE - 6)
@@ -77,7 +78,7 @@ private:
 	int mPort;
 
 	SOCKET socket_lis;
-	SOCKET socket_cli;
+	SOCKET socket_cli;	
 
 	bool isStop;
 	bool isRunning;
@@ -91,6 +92,9 @@ private:
 
 	Dxva2D3DUtils *mDxva2D3DUtils;
 	HWND mHwnd;
+
+	SOCKET client_sockets[MAX_NUM];
+	VideoService* mVideoService[MAX_NUM];
 
 };
 

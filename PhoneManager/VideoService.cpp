@@ -49,21 +49,22 @@ DWORD CALLBACK VideoService::ffplayThread(LPVOID lp)
 {
 	TRACE("VideoService ffplayThread start \n");	
 	VideoService *mPtr = (VideoService *)lp;	
-	isRunning = true;
-	while(isStop==false)
+	mPtr->isRunning = true;
+	while(mPtr->isStop==false)
 	{
 	    TRACE("loop read next frame.\n");
 		mPtr->ffplay();
 		Sleep(40);		
 	}
-	isRunning = false;
+	mPtr->isRunning = false;
 	TRACE("VideoService ffplayThread exit \n");	
 	return 0;
 }
 
 int VideoService:: interrupt_cb(void *ctx)
 {
-	if(isStop)
+	VideoService *mPtr = (VideoService *)ctx;	
+	if(mPtr->isStop)
 	{
 		TRACE("VideoService interrupt_cb \n");	
 		return 1;
@@ -288,12 +289,12 @@ DWORD VideoService::ffplay()
 		av_packet_unref(packet);
 	}
 
-	//	av_free(audio_buf);	
+	//av_free(audio_buf);	
 	//mDxva2D3DUtils->dxva2_uninit(pCodecCtx_video);
 	av_free(packet);
 	av_frame_free(&frame);
 	avcodec_close(pCodecCtx_video);
-	//	avcodec_close(pCodecCtx_audio);
+	//avcodec_close(pCodecCtx_audio);
 	avformat_close_input(&pFormatCtx);	
 	TRACE("VideoService ffplay thread exit\n");
 	return 0;
@@ -304,7 +305,7 @@ void VideoService::stop()
 	isStop = true;
 	while (isRunning){
 		TRACE("Can't stop VideoService, because is Running...\n");
-		Sleep(1000);
+		Sleep(10);
 	}
 }
 

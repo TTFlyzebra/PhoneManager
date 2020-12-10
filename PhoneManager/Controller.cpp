@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Controller.h"
 #include "FlyTools.h"
-#include "VideoService.h"
 #include <assert.h>
 #define EVENT_STOP (SDL_USEREVENT + 1)
 
@@ -400,6 +399,10 @@ Controller::Controller(void)
 	mPort = 9008;
 	socket_lis = INVALID_SOCKET;
 	socket_cli = INVALID_SOCKET;
+	for(int i=0;i<MAX_NUM;i++){
+		client_sockets[i] = INVALID_SOCKET;
+		mVideoService[i]=nullptr;
+	}
 	screen = &flyscreen;
 	screen->content_size.width = 400;
 	screen->content_size.height = 712;
@@ -467,8 +470,14 @@ DWORD CALLBACK Controller::socketThread(LPVOID lp)
 			int id = atoi(buff);
 			id = (id/10-1)*7+id%10-1;
 			TRACE("Controller client id=%d\n",id);
-			VideoService *mVideoService = new VideoService();
-			mVideoService->start(mPtr->mHwnd,mPtr->mDxva2D3DUtils,id);
+			mPtr->client_sockets[id]=mPtr->socket_cli;
+			//TODO:释放之前的内存
+			if(mPtr->mVideoService[id]!=nullptr){
+				mPtr->mVideoService[id]->stop();
+				delete mPtr->mVideoService[id];
+			}
+			mPtr->mVideoService[id] = new VideoService();
+			mPtr->mVideoService[id]->start(mPtr->mHwnd,mPtr->mDxva2D3DUtils,id);
 			//mPtr->m_sendThread = CreateThread(NULL, 0, &Controller::sendThread, lp, CREATE_SUSPENDED, NULL);  
 			//if (NULL!= mPtr->m_sendThread) {  
 			//	ResumeThread(mPtr->m_sendThread);  
@@ -572,6 +581,14 @@ void Controller::sendMouseButtonEvent(SDL_MouseButtonEvent *event)
 void Controller::stop()
 {
 	isStop = true;	
+
+	for(int i=0;i<MAX_NUM;i++){
+		if(mVideoService[i]!=nullptr){
+			mVideoService[i]->stop();
+			delete mVideoService[i];
+		}
+	}
+
 	SDL_Event stop_event;
 	stop_event.type = EVENT_STOP;
     SDL_PushEvent(&stop_event);

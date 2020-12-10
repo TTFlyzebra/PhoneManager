@@ -921,7 +921,7 @@ int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, i
 		libyuv::FOURCC_NV12);
 	g_pTexture[num]->UnlockRect(0);
 	surface->UnlockRect();
-	if(num==4){
+	if(num==0){
 		g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 50, 170), 1.0f, 0);
 		g_pd3dDevice->BeginScene();
 		for(int i=0;i<MAX_NUM;i++) {			

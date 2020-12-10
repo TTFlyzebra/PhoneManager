@@ -1,8 +1,7 @@
 #include "Dxva2D3DUtils.h"
 #pragma once
 
-static bool isRunning;
-static bool isStop;
+
 
 class VideoService
 {
@@ -24,5 +23,8 @@ private:
 
 	Dxva2D3DUtils *mDxva2D3DUtils;
 	HWND mHwnd;
+
+	bool isRunning;
+	bool isStop;
 };
 

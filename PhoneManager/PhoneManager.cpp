@@ -64,7 +64,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}		
 	}
-	
+
 	return (int) msg.wParam;
 }
 
@@ -115,14 +115,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		0, 0, 1920, 1000, NULL, NULL, hInstance, NULL);
+		0, 0, 640, 360, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
 		return FALSE;
 	}
-	//ShowWindow(hWnd, nCmdShow);
-	ShowWindow(hWnd, SW_MAXIMIZE);
+	ShowWindow(hWnd, nCmdShow);
+	//ShowWindow(hWnd, SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 	//³õÊ¼»¯Direct3D 
 
@@ -163,7 +163,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	TEXTMETRIC tm;
 	int width;
 	int height;
-
+	SDL_MouseButtonEvent button;
+	bool isMouse;
+	isMouse = false;
 	switch (message)
 	{
 	case WM_COMMAND:		
@@ -184,6 +186,39 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		WSACleanup();
 		PostQuitMessage(0);		
 		break;
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+		button.type = message==WM_LBUTTONDOWN?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
+		button.button = 1;
+		break;
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+		button.type = message==WM_MBUTTONDOWN?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
+		button.button = 2;
+		break;
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+		button.type = message==WM_RBUTTONDOWN?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
+		button.button = 3;
+		break;
+	case WM_MOUSEHWHEEL:
+		SDL_MouseWheelEvent wEvent;
+		TRACE("WM_MOUSEHWHEEL\n");
+		//wEvent.x=pMsg->pt.x-lRect.left;
+		//wEvent.y=pMsg->pt.y-lRect.top;
+		//mController->sendMouseWheelEvent(&wEvent);
+		break; 
+	case WM_MOUSEMOVE:
+		SDL_MouseMotionEvent mMotionEvent;
+		//mMotionEvent.x=pMsg->pt.x-lRect.left;
+		//mMotionEvent.y=pMsg->pt.y-lRect.top;
+		//mController->sendMouseMotionEvent(&mMotionEvent);
+		break;
+	//if(button.button>0){
+	//	button.x=pMsg->pt.x-lRect.left;
+	//	button.y=pMsg->pt.y-lRect.top;
+	//	mController->sendMouseButtonEvent(&button);
+	//}		
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
