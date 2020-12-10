@@ -70,9 +70,9 @@ public:
 	~Controller(void);
 	void start(HWND hwnd,Dxva2D3DUtils *mDxva2D3DUtils);
 	void stop();
-	void sendMouseMotionEvent(SDL_MouseMotionEvent *event);
-	void sendMouseWheelEvent(SDL_MouseWheelEvent *event);
-	void sendMouseButtonEvent(SDL_MouseButtonEvent *event);
+	void sendMouseMotionEvent(SDL_MouseMotionEvent *event, int id);
+	void sendMouseWheelEvent(SDL_MouseWheelEvent *event, int id);
+	void sendMouseButtonEvent(SDL_MouseButtonEvent *event, int id);
 private:
 
 	int mPort;

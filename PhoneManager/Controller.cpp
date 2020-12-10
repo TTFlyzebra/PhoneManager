@@ -478,10 +478,6 @@ DWORD CALLBACK Controller::socketThread(LPVOID lp)
 			}
 			mPtr->mVideoService[id] = new VideoService();
 			mPtr->mVideoService[id]->start(mPtr->mHwnd,mPtr->mDxva2D3DUtils,id);
-			//mPtr->m_sendThread = CreateThread(NULL, 0, &Controller::sendThread, lp, CREATE_SUSPENDED, NULL);  
-			//if (NULL!= mPtr->m_sendThread) {  
-			//	ResumeThread(mPtr->m_sendThread);  
-			//}	
 		}else{
 			if(mPtr->socket_lis != INVALID_SOCKET){
 				closesocket(mPtr->socket_lis);
@@ -502,78 +498,24 @@ DWORD CALLBACK Controller::socketThread(LPVOID lp)
 	return 0;
 }
 
-DWORD CALLBACK Controller::sendThread(LPVOID lp)
+void Controller::sendMouseMotionEvent(SDL_MouseMotionEvent *event, int id)
 {
-	Controller *mPtr=(Controller *)lp;
-	SOCKET  m_socket = mPtr->socket_cli;
-	SDL_Event event;	
-	while (!mPtr->isStop&&SDL_WaitEvent(&event)) {
-		switch (event.type) {
-		case EVENT_STOP:
-			closesocket(m_socket);
-			m_socket=INVALID_SOCKET;
-			closesocket(mPtr->socket_lis);
-			mPtr->socket_lis=INVALID_SOCKET;
-			TRACE("Controller SDLWindow stop\n");
-			return 0;
-		case SDL_QUIT:
-			closesocket(m_socket);
-			m_socket=INVALID_SOCKET;
-			closesocket(mPtr->socket_lis);
-			mPtr->socket_lis=INVALID_SOCKET;
-			TRACE("Controller SDL_WaitEvent SDL_QUIT\n");			
-			return 0;
-		case SDL_WINDOWEVENT:
-			break;
-		case SDL_TEXTINPUT:
-			break;
-		case SDL_KEYDOWN:
-			break;
-		case SDL_KEYUP:
-			break;
-		case SDL_MOUSEMOTION:
-			input_manager_process_mouse_motion(m_socket,&(event.motion));
-			break;
-		case SDL_MOUSEWHEEL:
-			input_manager_process_mouse_wheel(m_socket, &(event.wheel));
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:	
-			input_manager_process_mouse_button(m_socket,&(event.button));	
-			break;
-		case SDL_FINGERMOTION:
-		case SDL_FINGERDOWN:
-		case SDL_FINGERUP:
-			input_manager_process_touch(m_socket, &(event.tfinger));
-			break;
-		}
-		bool ret = IsSocketClosed(m_socket);
-		if(ret){
-			closesocket(m_socket);
-			break;
-		}		
-	}
-	return 0;
-}
-
-void Controller::sendMouseMotionEvent(SDL_MouseMotionEvent *event)
-{
-	if(socket_cli!=INVALID_SOCKET){
-		//input_manager_process_mouse_motion(socket_cli,event);	
+	if(client_sockets[id]!=INVALID_SOCKET){
+		input_manager_process_mouse_motion(client_sockets[id],event);	
 	}
 }
 
-void Controller::sendMouseWheelEvent(SDL_MouseWheelEvent *event)
+void Controller::sendMouseWheelEvent(SDL_MouseWheelEvent *event, int id)
 {
-	if(socket_cli!=INVALID_SOCKET){
-		//input_manager_process_mouse_wheel(socket_cli,event);	
+	if(client_sockets[id]!=INVALID_SOCKET){
+		input_manager_process_mouse_wheel(client_sockets[id],event);	
 	}
 }
 
-void Controller::sendMouseButtonEvent(SDL_MouseButtonEvent *event)
+void Controller::sendMouseButtonEvent(SDL_MouseButtonEvent *event, int id)
 {
-	if(socket_cli!=INVALID_SOCKET){
-		//input_manager_process_mouse_button(socket_cli,event);	
+	if(client_sockets[id]!=INVALID_SOCKET){
+		input_manager_process_mouse_button(client_sockets[id],event);	
 	}
 }
 

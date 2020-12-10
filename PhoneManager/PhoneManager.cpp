@@ -20,6 +20,9 @@ TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
 Dxva2D3DUtils mDxva2D3DUtils;
 Controller mController;
+int WIDTH;
+int HEIGHT;
+RECT mClientRect[MAX_NUM];
 
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -115,14 +118,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		0, 0, 640, 360, NULL, NULL, hInstance, NULL);
+		0, 0, 3840, 2160, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
 		return FALSE;
 	}
-	ShowWindow(hWnd, nCmdShow);
-	//ShowWindow(hWnd, SW_MAXIMIZE);
+	//ShowWindow(hWnd, nCmdShow);
+	ShowWindow(hWnd, SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 	//初始化Direct3D 
 
@@ -145,6 +148,26 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
+void initClientRect(HWND hWnd){
+	RECT rect;
+	GetClientRect(hWnd, &rect) ;
+	WIDTH=rect.right;
+	HEIGHT=rect.bottom;	
+	TRACE("WIDTH=%d,HEIGHT=%d\n",WIDTH,HEIGHT);
+	for(int i=0;i<MAX_NUM;i++){		
+		mClientRect[i].left = WIDTH/400.0f+(i%7)*WIDTH*399.0f/400.0f/7.0f;
+		mClientRect[i].right = mClientRect[i].left+(WIDTH*399.0f/400.0f/7.0f-WIDTH/400.0f);			
+		int t_height = (mClientRect[i].right-mClientRect[i].left)*16.0f/9.0f;
+		if(i/7==0){			
+			mClientRect[i].top = HEIGHT/2-WIDTH/400.0f-t_height;
+			mClientRect[i].bottom =  HEIGHT/2-WIDTH/400.0f;
+		}else{			
+			mClientRect[i].top = HEIGHT/2+WIDTH/400.0f;
+			mClientRect[i].bottom = HEIGHT/2+WIDTH/400.0f+t_height;;
+		}
+	}
+}
+
 //
 //  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
@@ -157,23 +180,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
-	TEXTMETRIC tm;
-	int width;
-	int height;
 	SDL_MouseButtonEvent button;
 	bool isMouse;
 	isMouse = false;
+	RECT rect;
+	int x;
+	int y;
+	int id;
 	switch (message)
 	{
 	case WM_COMMAND:		
 		break;
-	case WM_CREATE:		
-		RECT rect;
-		GetClientRect (hWnd, &rect) ;
-		TRACE("WM_CREATE\n");		
+	case WM_CREATE:	
+	case WM_SIZE:
+		initClientRect(hWnd);
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
@@ -190,40 +212,105 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONUP:
 		button.type = message==WM_LBUTTONDOWN?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
 		button.button = 1;
+		x = LOWORD (lParam);
+		y = HIWORD (lParam);
+		for(int i=0;i<MAX_NUM;i++){
+			if(x>=mClientRect[i].left&&x<=mClientRect[i].right&&y>=mClientRect[i].top&&y<=mClientRect[i].bottom){
+				button.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
+				button.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
+				mController.sendMouseButtonEvent(&button,i);
+				break;
+			}
+		}		
 		break;
 	case WM_MBUTTONDOWN:
 	case WM_MBUTTONUP:
 		button.type = message==WM_MBUTTONDOWN?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
 		button.button = 2;
+		x = LOWORD (lParam);
+		y = HIWORD (lParam);
+		for(int i=0;i<MAX_NUM;i++){
+			if(x>=mClientRect[i].left&&x<=mClientRect[i].right&&y>=mClientRect[i].top&&y<=mClientRect[i].bottom){
+				button.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
+				button.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
+				mController.sendMouseButtonEvent(&button,i);
+				break;
+			}
+		}			
 		break;
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
 		button.type = message==WM_RBUTTONDOWN?SDL_MOUSEBUTTONDOWN:SDL_MOUSEBUTTONUP;
 		button.button = 3;
+		x = LOWORD (lParam);
+		y = HIWORD (lParam);
+		for(int i=0;i<MAX_NUM;i++){
+			if(x>=mClientRect[i].left&&x<=mClientRect[i].right&&y>=mClientRect[i].top&&y<=mClientRect[i].bottom){
+				button.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
+				button.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
+				mController.sendMouseButtonEvent(&button,i);
+				break;
+			}
+		}	
 		break;
 	case WM_MOUSEHWHEEL:
 		SDL_MouseWheelEvent wEvent;
-		TRACE("WM_MOUSEHWHEEL\n");
-		//wEvent.x=pMsg->pt.x-lRect.left;
-		//wEvent.y=pMsg->pt.y-lRect.top;
-		//mController->sendMouseWheelEvent(&wEvent);
+		x = LOWORD (lParam);
+		y = HIWORD (lParam);
+		for(int i=0;i<MAX_NUM;i++){
+			if(x>=mClientRect[i].left&&x<=mClientRect[i].right&&y>=mClientRect[i].top&&y<=mClientRect[i].bottom){
+				wEvent.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
+				wEvent.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
+				mController.sendMouseWheelEvent(&wEvent,i);
+				break;
+			}
+		}
 		break; 
 	case WM_MOUSEMOVE:
 		SDL_MouseMotionEvent mMotionEvent;
-		//mMotionEvent.x=pMsg->pt.x-lRect.left;
-		//mMotionEvent.y=pMsg->pt.y-lRect.top;
-		//mController->sendMouseMotionEvent(&mMotionEvent);
-		break;
-	//if(button.button>0){
-	//	button.x=pMsg->pt.x-lRect.left;
-	//	button.y=pMsg->pt.y-lRect.top;
-	//	mController->sendMouseButtonEvent(&button);
-	//}		
+		x = LOWORD (lParam);
+		y = HIWORD (lParam);
+		for(int i=0;i<MAX_NUM;i++){
+			if(x>=mClientRect[i].left&&x<=mClientRect[i].right&&y>=mClientRect[i].top&&y<=mClientRect[i].bottom){
+				mMotionEvent.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
+				mMotionEvent.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
+				mController.sendMouseMotionEvent(&mMotionEvent,i);
+				break;
+			}
+		}	
+		break;		
 	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
+		return DefWindowProc(hWnd, message, wParam, lParam);		
 	}
 	return 0;
 }
+
+//float left = 1.0f+(i%7)*399.0f/(14/2.0f) - 200.0f;
+//float right = left+(399.0f/(14/2.0f)-1.0f);
+//float t_height = (right-left)*16.0f/9.0f*(float)width/(float)height;
+//float top = 0;
+//float bottom = 0;
+//float start = 200.0f - (400.0f - 2.0f *t_height - 1.0f*width/height)/2.0f;
+//if(i/(14/2)==0){			
+//	top = start;
+//	bottom = start - t_height;
+//}else{			
+//	top = start - t_height - 1.0f*width/height;
+//	bottom = start - 2.0f *t_height - 1.0f*width/height;
+//}
+////CUSTOMVERTEX g_Vertices[] =	{
+////	{ -200.0f, -200.0f,  0.0f,  0.0f, 1.0f},   
+////	{ -200.0f,  200.0f,  0.0f,  0.0f, 0.0f},    
+////	{  200.0f, -200.0f,  0.0f,  1.0f, 1.0f},    
+////	{  200.0f,  200.0f,  0.0f,  1.0f, 0.0f}	
+////};
+//CUSTOMVERTEX g_Vertices[] =
+//{
+//	{left,   bottom, 0.0f,  0.0f, 1.0f},   
+//	{left,   top,    0.0f,  0.0f, 0.0f},    
+//	{right,  bottom, 0.0f,  1.0f, 1.0f},    
+//	{right,  top,    0.0f,  1.0f, 0.0f}	
+//};
 
 // “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

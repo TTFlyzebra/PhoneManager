@@ -925,8 +925,8 @@ int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, i
 		g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 50, 170), 1.0f, 0);
 		g_pd3dDevice->BeginScene();
 		for(int i=0;i<MAX_NUM;i++) {			
-			if(g_pTexture[i]!=NULL){				
-				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
+			if(g_pTexture[0]!=NULL){				
+				g_pd3dDevice->SetTexture(0, g_pTexture[0]); //设置纹理(重剑：在俩三角形上贴了张图)
 				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
 				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);								
