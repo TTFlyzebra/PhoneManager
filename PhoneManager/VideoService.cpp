@@ -13,7 +13,7 @@ extern "C" {
 };
 
 
-#define PLAY_URL "rtmp://192.168.1.88/live/screen_%d"
+#define PLAY_URL "rtmp://192.168.8.244/live/screen_%d"
 
 
 VideoService::VideoService()
@@ -92,15 +92,14 @@ DWORD VideoService::ffplay()
 	pFormatCtx->interrupt_callback.callback = interrupt_cb;
 	pFormatCtx->interrupt_callback.opaque = pFormatCtx;
 	AVDictionary* avdic = NULL;
-	//av_dict_set(&avdic, "probesize", "32", 0);
-	//av_dict_set(&avdic, "max_analyze_duration", "100000", 0);
+	av_dict_set(&avdic, "probesize", "32", 0);
+	av_dict_set(&avdic, "max_analyze_duration", "100000", 0);
 	char playurl[1024];
 	memset(playurl,0,1024);
 	sprintf(playurl,PLAY_URL,myNUM);
 	TRACE("VideoService Couldn't open url=%s\n", playurl);
-	int ret =  avformat_open_input(&pFormatCtx, playurl, nullptr, &avdic);	
-	
-	//av_dict_free(&avdic);
+	int ret =  avformat_open_input(&pFormatCtx, playurl, nullptr, &avdic);		
+	av_dict_free(&avdic);
 	if (ret != 0) {
 		TRACE("VideoService Couldn't open url=%s, (ret:%d)\n", playurl, ret);
 		return -1;
@@ -305,7 +304,7 @@ void VideoService::stop()
 	isStop = true;
 	while (isRunning){
 		TRACE("Can't stop VideoService, because is Running...\n");
-		Sleep(10);
+		Sleep(100);
 	}
 }
 

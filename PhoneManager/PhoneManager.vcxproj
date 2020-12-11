@@ -163,8 +163,10 @@
     <ClInclude Include="Dxva2D3DUtils.h" />
     <ClInclude Include="FlyTools.h" />
     <ClInclude Include="PhoneManager.h" />
+    <ClInclude Include="protocol.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="screen.h" />
+    <ClInclude Include="SoundService.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="util\buffer_util.h" />
@@ -175,6 +177,7 @@
     <ClCompile Include="Dxva2D3DUtils.cpp" />
     <ClCompile Include="FlyTools.cpp" />
     <ClCompile Include="PhoneManager.cpp" />
+    <ClCompile Include="SoundService.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

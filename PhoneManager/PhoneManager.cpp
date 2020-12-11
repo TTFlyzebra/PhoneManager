@@ -10,6 +10,7 @@
 #include "VideoService.h"
 #include "FlyTools.h"
 #include "Controller.h"
+#include "SoundService.h"
 
 #define MAX_LOADSTRING 100
 
@@ -20,9 +21,11 @@ TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
 
 Dxva2D3DUtils mDxva2D3DUtils;
 Controller mController;
+SoundService mSoundService;
 int WIDTH;
 int HEIGHT;
 RECT mClientRect[MAX_NUM];
+int mCurrentSoundClent = -1;
 
 // 此代码模块中包含的函数的前向声明:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -145,6 +148,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		MessageBox(NULL, "创建纹理失败", "InitD3D", MB_OK);
 	}
 	mController.start(hWnd, &mDxva2D3DUtils);
+	//mSoundService.startPlay(0);
 	return TRUE;
 }
 
@@ -170,9 +174,7 @@ void initClientRect(HWND hWnd){
 
 //
 //  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
 //  目的: 处理主窗口的消息。
-//
 //  WM_COMMAND	- 处理应用程序菜单
 //  WM_PAINT	- 绘制主窗口
 //  WM_DESTROY	- 发送退出消息并返回
@@ -189,6 +191,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int x;
 	int y;
 	int id;
+	int selectClient = mCurrentSoundClent;
 	switch (message)
 	{
 	case WM_COMMAND:		
@@ -203,7 +206,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
-		mController.stop();
+		//mSoundService.stopPlay();
+		mController.stop();		
 		mDxva2D3DUtils.Cleanup();
 		WSACleanup();
 		PostQuitMessage(0);		
@@ -219,9 +223,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				button.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
 				button.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
 				mController.sendMouseButtonEvent(&button,i);
+				selectClient = i;
 				break;
 			}
-		}		
+		}
+		if(message==WM_LBUTTONDOWN){
+			if(selectClient!=mCurrentSoundClent){	
+				//mSoundService.switchPlay(selectClient);
+				mCurrentSoundClent = selectClient;
+			}
+		}
 		break;
 	case WM_MBUTTONDOWN:
 	case WM_MBUTTONUP:
@@ -234,6 +245,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				button.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
 				button.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
 				mController.sendMouseButtonEvent(&button,i);
+				selectClient = i;
 				break;
 			}
 		}			
@@ -249,6 +261,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				button.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
 				button.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
 				mController.sendMouseButtonEvent(&button,i);
+				selectClient = i;
 				break;
 			}
 		}	
@@ -262,6 +275,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				wEvent.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
 				wEvent.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
 				mController.sendMouseWheelEvent(&wEvent,i);
+				selectClient = i;
 				break;
 			}
 		}
@@ -275,42 +289,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				mMotionEvent.x=(x-mClientRect[i].left)*400/(mClientRect[i].right-mClientRect[i].left);
 				mMotionEvent.y=(y-mClientRect[i].top)*712/(mClientRect[i].bottom-mClientRect[i].top);
 				mController.sendMouseMotionEvent(&mMotionEvent,i);
+				selectClient = i;
 				break;
 			}
 		}	
 		break;		
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);		
-	}
+	}	
 	return 0;
 }
-
-//float left = 1.0f+(i%7)*399.0f/(14/2.0f) - 200.0f;
-//float right = left+(399.0f/(14/2.0f)-1.0f);
-//float t_height = (right-left)*16.0f/9.0f*(float)width/(float)height;
-//float top = 0;
-//float bottom = 0;
-//float start = 200.0f - (400.0f - 2.0f *t_height - 1.0f*width/height)/2.0f;
-//if(i/(14/2)==0){			
-//	top = start;
-//	bottom = start - t_height;
-//}else{			
-//	top = start - t_height - 1.0f*width/height;
-//	bottom = start - 2.0f *t_height - 1.0f*width/height;
-//}
-////CUSTOMVERTEX g_Vertices[] =	{
-////	{ -200.0f, -200.0f,  0.0f,  0.0f, 1.0f},   
-////	{ -200.0f,  200.0f,  0.0f,  0.0f, 0.0f},    
-////	{  200.0f, -200.0f,  0.0f,  1.0f, 1.0f},    
-////	{  200.0f,  200.0f,  0.0f,  1.0f, 0.0f}	
-////};
-//CUSTOMVERTEX g_Vertices[] =
-//{
-//	{left,   bottom, 0.0f,  0.0f, 1.0f},   
-//	{left,   top,    0.0f,  0.0f, 0.0f},    
-//	{right,  bottom, 0.0f,  1.0f, 1.0f},    
-//	{right,  top,    0.0f,  1.0f, 0.0f}	
-//};
 
 // “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

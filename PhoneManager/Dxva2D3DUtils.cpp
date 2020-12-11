@@ -897,8 +897,6 @@ int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, i
 	D3DLOCKED_RECT     objLockedRect;
 	HRESULT            hr;
 	int                ret;
-	
-
 	EnterCriticalSection(&cs);	
 	if(g_pTexture[num]==NULL){
 		D3DXCreateTexture(g_pd3dDevice, frame->width, frame->height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &g_pTexture[num]);
@@ -921,12 +919,20 @@ int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, i
 		libyuv::FOURCC_NV12);
 	g_pTexture[num]->UnlockRect(0);
 	surface->UnlockRect();
-	if(num==0){
+	bool willRefresh = true;
+	DWORD currentTime = GetTickCount(); 
+	DWORD useTime = currentTime-lastPlayTime;
+	if(useTime<100){
+		willRefresh = false;		
+	}else{
+		lastPlayTime = currentTime;
+	}
+	if(willRefresh&&useTime>30){
 		g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(45, 50, 170), 1.0f, 0);
 		g_pd3dDevice->BeginScene();
 		for(int i=0;i<MAX_NUM;i++) {			
-			if(g_pTexture[0]!=NULL){				
-				g_pd3dDevice->SetTexture(0, g_pTexture[0]); //设置纹理(重剑：在俩三角形上贴了张图)
+			if(g_pTexture[i]!=NULL){				
+				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
 				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
 				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
 				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);								

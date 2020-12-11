@@ -60,6 +60,12 @@
     <ClInclude Include="screen.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SoundService.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -78,6 +84,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Controller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundService.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
