@@ -15,8 +15,8 @@ extern "C" {
 //协议版本	2字节	Unsigned Integer	协议版本号，高位在前，从1开始
 //消息ID	2字节	Unsigned Integer	命令号0x044a
 //
-//采样率		2字节	Unsigned Integer	采样率，单位Hz，如：16000Hz
-//通道数		2字节	Unsigned Integer	单声道：1 双声道：   2
+//采样率    2字节	Unsigned Integer	采样率，单位Hz，如：16000Hz
+//通道数    2字节	Unsigned Integer	单声道：1 双声道：   2
 //音频格式	2字节	Unsigned Integer	2：ENCODING_PCM_16BIT 3：ENCODING_PCM_8BIT 4：ENCODING_PCM_FLOAT
 //结束符号	2字节	Unsigned Integer	固定的结束符号0x7e0d
 const static UCHAR PC_START_PLAY[22] = {0x7e,0xa5,0x00,0x00,0x00,0x12,0x00,0x02,0x04,0x4a,0x00,0x00,0x00,0x00,0x3e,0x80,0x00,0x02,0x00,0x02,0x7e,0x0d};
@@ -57,8 +57,8 @@ const static UCHAR PC_STOP_PLAY[16] = {0x7e,0xa5,0x00,0x00,0x00,0x0c,0x00,0x02,0
 //消息长度	4字节	Unsigned Integer	消息总长度，不包括开始和结束符
 //协议版本	2字节	Unsigned Integer	协议版本号，高位在前，从1开始
 //消息ID	2字节	Unsigned Integer	命令号0x0450
-//采样率		2字节	Unsigned Integer	采样率，单位Hz，如：16000Hz
-//通道数		2字节	Unsigned Integer	单声道：1 双声道：2
+//采样率    2字节	Unsigned Integer	采样率，单位Hz，如：16000Hz
+//通道数    2字节	Unsigned Integer	单声道：1 双声道：2
 //音频格式	2字节	Unsigned Integer	2：ENCODING_PCM_16BIT 3：ENCODING_PCM_8BIT 4：ENCODING_PCM_FLOAT
 //缓冲大小	2字节	Unsigned Integer	缓冲字节数
 //结束符号	2字节	Unsigned Integer	固定的结束符号0x7e0d

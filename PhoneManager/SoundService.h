@@ -34,7 +34,7 @@ private:
 	int play_sample_rate;  //播放采样率 
 	static const int PCM_OUT_RATE = 16000;  //播放采样率 
 	static const int OUT_BUF_MAX = 8;
-	static const int OUT_BUF_SIZE = 10240;
+	static const int OUT_BUF_SIZE = 48000;
 	char *outBuf[OUT_BUF_SIZE];
 	
 	static const int PCM_IN_RATE = 8000;  //话筒采样率

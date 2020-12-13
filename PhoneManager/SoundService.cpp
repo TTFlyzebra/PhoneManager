@@ -3,7 +3,6 @@
 #include "FlyTools.h"
 #include "protocol.h"
 
-
 SoundService::SoundService(void)
 {
 	is_stop = 1;
@@ -33,7 +32,6 @@ SoundService::SoundService(void)
 	pInFormat.nBlockAlign = 1 * 16 / 8; // = n.Channels * wBitsPerSample/8 
 	pInFormat.cbSize = 0; 
 }
-
 
 SoundService::~SoundService(void)
 {	
@@ -198,6 +196,7 @@ DWORD CALLBACK SoundService::recvThread(LPVOID lp)
 		}else if(((byte)mPtr->recv_buf[0]==0x7e)&&((byte)mPtr->recv_buf[1]==0xa5)&&((byte)mPtr->recv_buf[8]==0x04)&&((byte)mPtr->recv_buf[9]==0x4b)) {
 			int dataLen = (((byte)mPtr->recv_buf[14]<<24)&0xFF000000)+(((byte)mPtr->recv_buf[15]<<16)&0xFF0000)+(((byte)mPtr->recv_buf[16]<<8)&0xFF00)+(byte)mPtr->recv_buf[17];
 			//TRACE("recv play data, dataLen=%d\n",dataLen);
+			memset(mPtr->outBuf[i],0,OUT_BUF_SIZE);
 			memcpy(mPtr->outBuf[i],mPtr->recv_buf+sizeof(PC_PLAY_DATA)-2,dataLen);
 			mPtr->WaveOutHdr[i].lpData = mPtr->outBuf[i];
 			mPtr->WaveOutHdr[i].dwBufferLength = dataLen;

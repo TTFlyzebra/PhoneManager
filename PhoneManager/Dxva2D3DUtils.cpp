@@ -744,9 +744,9 @@ HRESULT Dxva2D3DUtils::InitD3D( HWND hWnd, int width, int height )
 	g_pd3dDevice->SetTransform( D3DTS_PROJECTION, &matProj );
 
 	//创建纹理对象
-	if( FAILED( D3DXCreateTextureFromFile( g_pd3dDevice, "texture.jpg", &_dfTexture ) ) )
+	if( FAILED( D3DXCreateTextureFromFile( g_pd3dDevice, "face.jpg", &_dfTexture ) ) )
 	{
-		MessageBox(NULL, "创建纹理失败", "Texture", MB_OK);
+		MessageBox(NULL, "创建纹理失败(D3DXCreateTextureFromFile)", "ERRIR", MB_OK);
 		return E_FAIL;
 	}
 	//
@@ -933,10 +933,14 @@ int Dxva2D3DUtils::dxva2_retrieve_data_call(AVCodecContext *s, AVFrame *frame, i
 		for(int i=0;i<MAX_NUM;i++) {			
 			if(g_pTexture[i]!=NULL){				
 				g_pd3dDevice->SetTexture(0, g_pTexture[i]); //设置纹理(重剑：在俩三角形上贴了张图)
-				g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
-				g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
-				g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);								
-			}			
+			}
+			else{
+				g_pd3dDevice->SetTexture(0, _dfTexture);
+			}
+			g_pd3dDevice->SetStreamSource( 0, g_pVB[i], 0, sizeof(CUSTOMVERTEX) );
+			g_pd3dDevice->SetFVF(D3DFVF_CUSTOMVERTEX);
+			g_pd3dDevice->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2);								
+		
 		}
 		g_pd3dDevice->EndScene();
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );

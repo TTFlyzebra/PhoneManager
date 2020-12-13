@@ -42,6 +42,7 @@
     <PlatformToolset>v110</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -78,8 +79,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\VCPRO\PhoneManager\libyuv\include;D:\VCPRO\PhoneManager\ffmpeg\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;D:\VCPRO\PhoneManager\libyuv\lib\x86;D:\VCPRO\PhoneManager\ffmpeg\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\VCPRO\PhoneManager\SDL2-2.0.12\include;D:\VCPRO\PhoneManager\libyuv\include;D:\VCPRO\PhoneManager\ffmpeg\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\VCPRO\PhoneManager\SDL2-2.0.12\lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;D:\VCPRO\PhoneManager\libyuv\lib\x86;D:\VCPRO\PhoneManager\ffmpeg\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -123,7 +124,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -131,7 +132,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>

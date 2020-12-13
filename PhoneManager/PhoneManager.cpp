@@ -95,7 +95,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PHONEMANAGER));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	=  CreateSolidBrush(RGB(45, 50, 170));;
-	wcex.lpszMenuName	= NULL;
+	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_PHONEMANAGER);;
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -104,9 +104,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 //
 //   函数: InitInstance(HINSTANCE, int)
-//
 //   目的: 保存实例句柄并创建主窗口
-//
 //   注释:
 //
 //        在此函数中，我们在全局变量中保存实例句柄并
@@ -121,7 +119,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	//	CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-		0, 0, 3840, 2160, NULL, NULL, hInstance, NULL);
+		0, 0, 1920, 1080, NULL, NULL, hInstance, NULL);
 
 	if (!hWnd)
 	{
@@ -148,7 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		MessageBox(NULL, "创建纹理失败", "InitD3D", MB_OK);
 	}
 	mController.start(hWnd, &mDxva2D3DUtils);
-	//mSoundService.startPlay(0);
+	mSoundService.startPlay(0);
 	return TRUE;
 }
 
@@ -179,9 +177,9 @@ void initClientRect(HWND hWnd){
 //  WM_PAINT	- 绘制主窗口
 //  WM_DESTROY	- 发送退出消息并返回
 //
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
 	SDL_MouseButtonEvent button;
@@ -194,7 +192,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int selectClient = mCurrentSoundClent;
 	switch (message)
 	{
-	case WM_COMMAND:		
+	case WM_COMMAND:
+		wmId    = LOWORD(wParam);
+		wmEvent = HIWORD(wParam);
+		// 分析菜单选择:
+		switch (wmId)
+		{
+		case IDM_ABOUT:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			break;
+		case IDM_EXIT:
+			DestroyWindow(hWnd);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
 		break;
 	case WM_CREATE:	
 	case WM_SIZE:
@@ -206,7 +218,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
-		//mSoundService.stopPlay();
+		mSoundService.stopPlay();
 		mController.stop();		
 		mDxva2D3DUtils.Cleanup();
 		WSACleanup();
@@ -228,8 +240,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		if(message==WM_LBUTTONDOWN){
+			TRACE("switchPlay sound %d to %d.\n", mCurrentSoundClent, selectClient);
 			if(selectClient!=mCurrentSoundClent){	
-				//mSoundService.switchPlay(selectClient);
+				mSoundService.switchPlay(selectClient);
 				mCurrentSoundClent = selectClient;
 			}
 		}
