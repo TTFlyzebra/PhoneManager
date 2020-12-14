@@ -242,7 +242,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if(message==WM_LBUTTONDOWN){
 			TRACE("switchPlay sound %d to %d.\n", mCurrentSoundClent, selectClient);
 			if(selectClient!=mCurrentSoundClent){	
-				mSoundService.switchPlay(selectClient);
+				mSoundService.stopPlay();
+				mSoundService.startPlay(selectClient);
+				//mSoundService.switchPlay(selectClient);
 				mCurrentSoundClent = selectClient;
 			}
 		}

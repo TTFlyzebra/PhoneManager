@@ -111,7 +111,7 @@ DWORD CALLBACK SoundService::socketThread(LPVOID lp)
 			mPtr->client_sockets[id] = socket;
 			int sample_rate = ((buff[14]<<8)&0xFF00)+(byte)buff[15];
 			mPtr->sample_rates[id] = sample_rate; 
-			if(mPtr->m_recvThread != NULL){
+			if(mPtr->m_recvThread != NULL && id == mPtr->mClientID){
 				mPtr->m_recvThread = CreateThread(NULL, 0, &SoundService::recvThread, lp, CREATE_SUSPENDED, NULL);  
 				if (NULL!= mPtr->m_recvThread) {  
 				     ResumeThread(mPtr->m_recvThread);  
