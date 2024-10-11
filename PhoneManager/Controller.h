@@ -1,3 +1,5 @@
+#pragma once
+
 #include <winsock2.h>
 #include <windows.h>
 #include <SDL.h>
@@ -10,10 +12,6 @@
 #define CONTROL_MSG_MAX_SIZE (1 << 18) // 256k
 #define CONTROL_MSG_INJECT_TEXT_MAX_LENGTH 300
 #define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH (CONTROL_MSG_MAX_SIZE - 6)
-
-#pragma comment(lib,"ws2_32.lib")
-#pragma once
-
 
 enum control_msg_type {
 	CONTROL_MSG_TYPE_INJECT_KEYCODE,

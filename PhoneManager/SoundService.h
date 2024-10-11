@@ -1,10 +1,9 @@
+#pragma once
 #include "Dxva2D3DUtils.h"
 #include <MMSystem.h> 
 #include <winsock2.h>
 #include <windows.h>
-#pragma comment(lib,"ws2_32.lib")
-#pragma comment(lib,"winmm.lib") 
-#pragma once
+
 class SoundService
 {
 public:

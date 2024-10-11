@@ -1,3 +1,5 @@
+#pragma once
+
 #include <d3dx9.h>
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -9,12 +11,6 @@ extern "C" {
 #include "libavutil/pixfmt.h"
 #include "libavutil/rational.h"
 };
-#pragma once
-
-#pragma comment(lib,"d3d9.lib") 
-#pragma comment(lib,"winmm.lib") 
-#pragma comment(lib,"d3dx9.lib")
-#pragma comment(lib,"yuv.lib") 
 
 #define MAX_NUM 14
 #define D3DFVF_CUSTOMVERTEX   (D3DFVF_XYZ|D3DFVF_TEX1)

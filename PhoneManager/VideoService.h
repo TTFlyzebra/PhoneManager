@@ -1,7 +1,6 @@
-#include "Dxva2D3DUtils.h"
 #pragma once
 
-
+#include "Dxva2D3DUtils.h"
 
 class VideoService
 {
