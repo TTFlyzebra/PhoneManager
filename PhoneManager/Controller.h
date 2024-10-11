@@ -1,6 +1,6 @@
 #include <winsock2.h>
 #include <windows.h>
-#include "SDL.h"
+#include <SDL.h>
 #include "android\input.h"
 #include "android\keycodes.h"
 #include "util\buffer_util.h"

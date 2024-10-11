@@ -96,7 +96,7 @@ DWORD VideoService::ffplay()
 	av_dict_set(&avdic, "max_analyze_duration", "100000", 0);
 	char playurl[1024];
 	memset(playurl,0,1024);
-	sprintf(playurl,PLAY_URL,myNUM);
+	sprintf_s(playurl,PLAY_URL,myNUM);
 	TRACE("VideoService Couldn't open url=%s\n", playurl);
 	int ret =  avformat_open_input(&pFormatCtx, playurl, nullptr, &avdic);		
 	av_dict_free(&avdic);
